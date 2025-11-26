@@ -18,13 +18,16 @@ pub struct RepoInfo {
     pub path: String,
     pub name: String,
     pub branch: String,
+    #[serde(rename = "totalCommits")]
     pub total_commits: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepoStats {
+    #[serde(rename = "totalCommits")]
     pub total_commits: usize,
     pub authors: usize,
+    #[serde(rename = "filesChanged")]
     pub files_changed: usize,
     pub insertions: usize,
     pub deletions: usize,

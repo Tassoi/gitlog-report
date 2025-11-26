@@ -8,6 +8,24 @@
     "core:path:default",
     "opener:default",
     "dialog:default",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "core:path:allow-resolve-directory",
+    "core:path:allow-resolve",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$HOME/**" }, { "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [{ "path": "$HOME/**" }, { "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$HOME/**" }, { "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:allow-stat",
+      "allow": [{ "path": "$HOME/**" }, { "path": "$APPDATA/**" }]
+    }
   ]
 }

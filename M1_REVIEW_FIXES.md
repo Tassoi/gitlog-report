@@ -9,6 +9,7 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 **Problem**: Frontend used camelCase, backend used snake_case, causing serialization failures.
 
 **Solution**:
+
 - Added `#[serde(rename = "...")]` to all Rust structs:
   - `totalCommits`, `generatedAt`, `exportFormat`
   - `apiKey`, `baseUrl`, `modelPath`
@@ -16,6 +17,7 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 - TypeScript types now match exactly with Rust models
 
 **Files Changed**:
+
 - `src-tauri/src/models/commit.rs`
 - `src-tauri/src/models/config.rs`
 - `src-tauri/src/models/report.rs`
@@ -35,6 +37,7 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 - **`save_api_key`**: Validates non-empty keys
 
 **Files Changed**:
+
 - `src-tauri/src/commands/git.rs`
 - `src-tauri/src/commands/report.rs`
 - `src-tauri/src/commands/config.rs`
@@ -47,21 +50,25 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 **Solution**:
 
 **State Management** (Zustand):
+
 - `repoStore`: Manages repository info, commits, and selections
 - `reportStore`: Manages current report and generation state
 
 **Custom Hooks**:
+
 - `useGitRepo`: Repository operations (select, open, getCommits, getDiff)
 - `useReportGen`: Report generation (weekly, monthly, export)
 - `useLLMConfig`: Configuration management (save, load, API keys)
 
 **Components Updated**:
+
 - `RepoSelector`: File dialog integration, async repo loading
 - `CommitList`: Interactive commit selection with Tailwind styling
 - `ReportViewer`: Report generation buttons and preview
 - `App.tsx`: Main layout with all components wired together
 
 **Files Changed**:
+
 - `src/App.tsx` (complete rewrite)
 - `src/main.tsx` (import index.css)
 - `src/components/*/` (all components updated)
@@ -74,6 +81,7 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 **Problem**: Missing dialog plugin and permissions for file selection.
 
 **Solution**:
+
 - Added `tauri-plugin-dialog` dependency
 - Updated `capabilities/default.json` with:
   - `dialog:default`
@@ -83,6 +91,7 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 - Updated window config: 1200x800, minWidth/minHeight
 
 **Files Changed**:
+
 - `src-tauri/Cargo.toml`
 - `src-tauri/capabilities/default.json`
 - `src-tauri/tauri.conf.json`
@@ -91,16 +100,19 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 ### 5. ✅ Dependencies Aligned with Plan
 
 **Frontend**:
+
 - ✅ Zustand (state management)
 - ✅ Tailwind CSS (styling)
 - ✅ @tauri-apps/plugin-dialog (file selection)
 
 **Backend**:
+
 - ✅ lazy_static (in-memory storage for M1)
 - ✅ tokio, chrono, uuid (already added in M1)
 - 📝 git2, reqwest, keyring (commented for M2+)
 
 **Files Changed**:
+
 - `package.json` (zustand, tailwindcss, autoprefixer, postcss)
 - `src-tauri/Cargo.toml` (lazy_static, tauri-plugin-dialog)
 
@@ -109,11 +121,13 @@ Based on the M1 review feedback, all 5 major issues have been addressed:
 To verify the M1 skeleton works:
 
 1. **Install Rust** (if not already):
+
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    ```
 
 2. **Run development server**:
+
    ```bash
    cd /Users/hkdev/Documents/week/gitlog-ai-reporter
    npm run tauri dev
@@ -152,6 +166,7 @@ To verify the M1 skeleton works:
 ## Next Steps (M2)
 
 The skeleton is now ready for M2 implementation:
+
 1. Add git2 dependency and implement real Git parsing
 2. Implement actual repository opening and validation
 3. Parse real commits with timestamps and authors

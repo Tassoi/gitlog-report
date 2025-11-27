@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Folder, FolderOpen, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useRepoStore } from '../../store';
 import { useGitRepo } from '../../hooks/useGitRepo';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,8 @@ const RepoHistory = () => {
   const handleRepoClick = async (repoId: string) => {
     const repo = repoHistory.find(r => r.id === repoId);
     if (!repo) return;
+
+    const toastId = toast.loading(`Loading repository ${repo.name}...`);
 
     try {
       setLoadingId(repoId);
@@ -33,9 +36,11 @@ const RepoHistory = () => {
         Math.floor(now / 1000)
       );
       setCommits(commits);
+
+      toast.success(`Successfully loaded ${repo.name}`, { id: toastId });
     } catch (error) {
       console.error('Failed to load repository:', error);
-      // Optionally show error to user
+      toast.error(`Failed to load repository: ${error instanceof Error ? error.message : 'Unknown error'}`, { id: toastId });
     } finally {
       setLoadingId(null);
     }

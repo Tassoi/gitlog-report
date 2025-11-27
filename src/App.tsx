@@ -1,3 +1,4 @@
+import { Toaster } from 'sonner';
 import { Sidebar } from './components/Sidebar';
 import RepoSelector from './components/RepoSelector';
 import CommitList from './components/CommitList';
@@ -9,6 +10,7 @@ function App() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <Toaster position="top-right" richColors />
       {/* Sidebar */}
       <Sidebar />
 

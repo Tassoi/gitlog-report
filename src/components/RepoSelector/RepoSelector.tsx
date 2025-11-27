@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useGitRepo } from '../../hooks/useGitRepo';
 import { useRepoStore } from '../../store';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,16 @@ const RepoSelector = () => {
   const { repoInfo, setRepoInfo, setCommits, addRepoToHistory } = useRepoStore();
 
   const handleSelectRepo = async () => {
+    let toastId: string | number | undefined;
+
     try {
       setIsLoading(true);
       setError(null);
 
       const path = await selectRepository();
       if (!path) return;
+
+      toastId = toast.loading('Opening repository...');
 
       const info = await openRepository(path);
       setRepoInfo(info);
@@ -34,8 +39,12 @@ const RepoSelector = () => {
         Math.floor(now / 1000)
       );
       setCommits(commits);
+
+      toast.success(`Successfully opened ${info.name}`, { id: toastId });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to open repository');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to open repository';
+      setError(errorMessage);
+      toast.error(`Failed to open repository: ${errorMessage}`, { id: toastId });
     } finally {
       setIsLoading(false);
     }

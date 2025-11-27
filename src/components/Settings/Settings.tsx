@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Moon, Sun, Monitor } from 'lucide-react';
+import LLMConfigTab from './LLMConfigTab';
+import TemplateManagement from './TemplateManagement';
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -16,9 +18,10 @@ const Settings = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="appearance" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="llm">LLM Config</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
           </TabsList>
 
@@ -66,21 +69,11 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="llm" className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">LLM Configuration</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure your LLM provider and API keys. This feature will be implemented in M3+.
-              </p>
-            </div>
+            <LLMConfigTab />
+          </TabsContent>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Model Selection</h3>
-              <p className="text-sm text-muted-foreground">
-                Choose between OpenAI, DeepSeek, or local models. Coming soon in M3+.
-              </p>
-            </div>
+          <TabsContent value="templates">
+            <TemplateManagement />
           </TabsContent>
 
           <TabsContent value="export" className="space-y-4">

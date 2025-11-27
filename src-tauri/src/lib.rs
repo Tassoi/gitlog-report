@@ -5,7 +5,7 @@ mod services;
 mod utils;
 
 // Re-export commands for registration
-use commands::{config, git, llm, report};
+use commands::{config, export, git, llm, report, template};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -18,6 +18,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             greet,
             // Git commands
@@ -31,7 +32,15 @@ pub fn run() {
             // Report commands
             report::generate_weekly_report,
             report::generate_monthly_report,
-            report::export_report,
+            // Export commands (M4)
+            export::export_report,
+            export::get_save_path,
+            // Template commands (M4.3)
+            template::list_templates,
+            template::get_template,
+            template::create_template,
+            template::update_template,
+            template::delete_template,
             // Config commands
             config::save_config,
             config::load_config,

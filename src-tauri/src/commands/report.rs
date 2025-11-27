@@ -1,40 +1,40 @@
 // Report-related Tauri commands
 
 use crate::models::{Commit, Report, ReportType};
+use crate::services::{llm_service::LLMService, report_service::ReportService, storage_service::StorageService};
+use std::sync::Arc;
+use tauri::AppHandle;
 
 #[tauri::command]
-pub async fn generate_weekly_report(commits: Vec<Commit>) -> Result<Report, String> {
-    // Return mock report for M1
-    Ok(Report {
-        id: uuid::Uuid::new_v4().to_string(),
-        report_type: ReportType::Weekly,
-        generated_at: chrono::Utc::now().timestamp(),
-        content: format!(
-            "# Weekly Report\n\n## Summary\n\nAnalyzed {} commits this week.\n\n## Highlights\n\n- Feature development\n- Bug fixes\n- Documentation updates",
-            commits.len()
-        ),
-        commits,
-    })
+pub async fn generate_weekly_report(
+    commits: Vec<Commit>,
+    app: AppHandle,
+) -> Result<Report, String> {
+    // Load configuration
+    let config = StorageService::load_config(&app)?;
+
+    // Create services
+    let llm_service = Arc::new(LLMService::new(config.llm_provider));
+    let report_service = ReportService::new(llm_service);
+
+    // Generate report with streaming
+    report_service.generate_weekly(commits, app).await
 }
 
 #[tauri::command]
-pub async fn generate_monthly_report(commits: Vec<Commit>) -> Result<Report, String> {
-    // Return mock report for M1
-    Ok(Report {
-        id: uuid::Uuid::new_v4().to_string(),
-        report_type: ReportType::Monthly,
-        generated_at: chrono::Utc::now().timestamp(),
-        content: format!(
-            "# Monthly Report\n\n## Summary\n\nAnalyzed {} commits this month.\n\n## Key Achievements\n\n- Project milestones\n- Team collaboration\n- Code quality improvements",
-            commits.len()
-        ),
-        commits,
-    })
+pub async fn generate_monthly_report(
+    commits: Vec<Commit>,
+    app: AppHandle,
+) -> Result<Report, String> {
+    // Load configuration
+    let config = StorageService::load_config(&app)?;
+
+    // Create services
+    let llm_service = Arc::new(LLMService::new(config.llm_provider));
+    let report_service = ReportService::new(llm_service);
+
+    // Generate report with streaming
+    report_service.generate_monthly(commits, app).await
 }
 
-#[tauri::command]
-pub async fn export_report(report: Report, format: String) -> Result<String, String> {
-    // Return mock export path for M1
-    let timestamp = chrono::Utc::now().timestamp();
-    Ok(format!("/tmp/report_{}.{}", timestamp, format))
-}
+// Note: export_report command moved to commands/export.rs for M4 implementation

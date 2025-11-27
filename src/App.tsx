@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import CommitList from './components/CommitList';
 import ReportViewer from './components/ReportViewer';
 import FilterToolbar from './components/FilterToolbar';
+import Settings from './components/Settings';
 import { useRepoStore } from './store';
 import { useGitRepo } from './hooks/useGitRepo';
 import { Button } from '@/components/ui/button';
@@ -14,11 +15,11 @@ import {
   FileText,
   History,
   FolderOpen,
-  Settings,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 
 function App() {
-  const { commits, repoInfo } = useRepoStore();
+  const { commits, repoInfo, setRepoInfo, setCommits, addRepoToHistory } = useRepoStore();
   const { selectRepository, openRepository, getCommits } = useGitRepo();
 
   // Tab state
@@ -41,27 +42,36 @@ function App() {
   };
 
   const handleOpenRepo = async () => {
+    let loadingToast: string | number | undefined;
     try {
       const path = await selectRepository();
       if (!path) return;
 
-      toast.loading('正在打开仓库...');
+      loadingToast = toast.loading('正在打开仓库...');
 
+      // Open repository and get info
       const info = await openRepository(path);
-      // addRepoToHistory will be called by RepoSelector hook
+      setRepoInfo(info);
+
+      // Add to history
+      addRepoToHistory(info);
 
       // Load commits based on current time range
       const { from, to } = getTimeRangeTimestamps(timeRange);
-      await getCommits(path, from, to);
+      const fetchedCommits = await getCommits(path, from, to);
+      setCommits(fetchedCommits);
 
-      toast.success(`成功打开仓库：${info.name}`);
+      toast.dismiss(loadingToast);
+      toast.success(`成功打开仓库：${info.name}，加载了 ${fetchedCommits.length} 个提交`);
     } catch (error) {
+      if (loadingToast) toast.dismiss(loadingToast);
       toast.error(`打开仓库失败：${error instanceof Error ? error.message : '未知错误'}`);
     }
   };
 
   const handleSettings = () => {
-    toast.info('设置功能开发中（M3）');
+    setActiveTab('settings');
+    toast.success('切换到设置');
   };
 
   // Time range change handler
@@ -72,8 +82,9 @@ function App() {
 
     try {
       const { from, to } = getTimeRangeTimestamps(newRange);
-      await getCommits(repoInfo.path, from, to);
-      toast.success(`已切换到：${getTimeRangeLabel(newRange)}`);
+      const fetchedCommits = await getCommits(repoInfo.path, from, to);
+      setCommits(fetchedCommits);
+      toast.success(`已切换到：${getTimeRangeLabel(newRange)}，加载了 ${fetchedCommits.length} 个提交`);
     } catch (error) {
       toast.error('加载提交失败');
     }
@@ -143,7 +154,7 @@ function App() {
                   onClick={handleSettings}
                   className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
                 >
-                  <Settings className="mr-2 h-4 w-4" />
+                  <SettingsIcon className="mr-2 h-4 w-4" />
                   设置
                 </Button>
               </div>
@@ -169,7 +180,7 @@ function App() {
             onTimeRangeChange={handleTimeRangeChange}
           />
 
-          {/* Tabs: Report / Commits */}
+          {/* Tabs: Report / Commits / Settings */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <TabsList>
               <TabsTrigger value="report" className="flex items-center gap-2">
@@ -180,6 +191,10 @@ function App() {
                 <GitCommit className="h-4 w-4" />
                 提交
               </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <SettingsIcon className="h-4 w-4" />
+                设置
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="report">
@@ -189,11 +204,15 @@ function App() {
             <TabsContent value="commits">
               <CommitList commits={filteredCommits} />
             </TabsContent>
+
+            <TabsContent value="settings">
+              <Settings />
+            </TabsContent>
           </Tabs>
 
           {/* Footer */}
           <footer className="pb-4 text-center">
-            <p className="text-xs text-muted-foreground">M2 Complete</p>
+            <p className="text-xs text-muted-foreground">M3 - LLM Integration Complete</p>
           </footer>
         </div>
       </main>

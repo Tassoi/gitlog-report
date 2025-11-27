@@ -33,9 +33,25 @@ lazy_static = "1.4"
 # Git dependencies
 git2 = { version = "0.18", features = ["vendored-libgit2"] }
 
-# HTTP client (to be added when needed)
-# reqwest = { version = "0.11", features = ["json"] }
+# HTTP client for LLM API calls (M3)
+reqwest = { version = "0.11", features = ["json", "rustls-tls", "stream"] }
 
-# Keyring for secure storage (to be added when needed)
+# Template engine for report generation (M3)
+handlebars = "5.1"
+
+# Configuration persistence (M3)
+tauri-plugin-store = "2.0.0"
+
+# Async utilities (M3)
+futures = "0.3"
+tokio-stream = "0.1"
+
+# Error handling (M3)
+anyhow = "1.0"
+
+# Markdown to HTML conversion (M4)
+pulldown-cmark = "0.9"
+
+# Keyring for secure storage (M5 - deferred)
 # keyring = "2.0"
 

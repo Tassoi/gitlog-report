@@ -116,7 +116,7 @@ const ReportViewer = () => {
             </CardHeader>
             <Separator />
             <CardContent className="pt-6">
-              <ScrollArea className="h-96 w-full rounded-md border p-4">
+              <ScrollArea className="min-h-[520px] w-full rounded-md border p-4">
                 <pre className="whitespace-pre-wrap text-sm font-mono">
                   {currentReport.content}
                 </pre>

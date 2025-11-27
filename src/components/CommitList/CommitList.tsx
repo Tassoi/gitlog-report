@@ -27,7 +27,7 @@ const CommitList = ({ commits }: CommitListProps) => {
         {commits.length === 0 ? (
           <p className="text-sm text-muted-foreground">No commits to display. Select a repository first.</p>
         ) : (
-          <ScrollArea className="h-96 w-full pr-4">
+          <ScrollArea className="min-h-[520px] w-full pr-4">
             <div className="space-y-2">
               {commits.map((commit) => {
                 const isSelected = selectedCommits.includes(commit.hash);

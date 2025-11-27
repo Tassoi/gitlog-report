@@ -3,6 +3,7 @@
 ## 问题
 
 启动时遇到错误：
+
 ```
 Permission fs:allow-read-text-file not found
 ```
@@ -10,6 +11,7 @@ Permission fs:allow-read-text-file not found
 ## 原因
 
 之前的权限配置格式不正确。在 Tauri 2.0 中，不能使用以下格式：
+
 ```json
 {
   "identifier": "fs:allow-read-text-file",
@@ -22,14 +24,10 @@ Permission fs:allow-read-text-file not found
 ### M1 阶段（当前）
 
 简化权限配置，只保留必要的权限：
+
 ```json
 {
-  "permissions": [
-    "core:default",
-    "core:path:default",
-    "opener:default",
-    "dialog:default"
-  ]
+  "permissions": ["core:default", "core:path:default", "opener:default", "dialog:default"]
 }
 ```
 
@@ -68,6 +66,7 @@ async fn open_repository(
 #### 方式 2: 使用预定义权限
 
 在 `capabilities/default.json` 中添加：
+
 ```json
 {
   "permissions": [
@@ -92,11 +91,13 @@ async fn open_repository(
 ## 安装 Rust
 
 如果尚未安装 Rust，运行：
+
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 然后重新启动终端并运行：
+
 ```bash
 npm run tauri dev
 ```

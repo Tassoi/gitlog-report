@@ -26,6 +26,9 @@ pub fn run() {
             git::get_commits,
             git::get_commit_diff,
             git::get_repo_stats,
+            // Cache commands (M6 - LLM only)
+            git::get_cache_stats,
+            git::clear_llm_cache,
             // LLM commands
             llm::configure_llm,
             llm::test_llm_connection,

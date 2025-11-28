@@ -9,6 +9,8 @@ interface RepoStore {
   repoInfo: RepoInfo | null;
   commits: Commit[];
   selectedCommits: string[];
+  commitDiffs: Record<string, string>;
+  loadingDiffs: Set<string>;
 
   // Persisted state
   repoHistory: RepoHistoryItem[];
@@ -19,6 +21,9 @@ interface RepoStore {
   setCommits: (commits: Commit[]) => void;
   toggleCommit: (hash: string) => void;
   clearSelection: () => void;
+
+  // Diff actions
+  loadCommitDiff: (repoPath: string, hash: string) => Promise<void>;
 
   // History management
   addRepoToHistory: (repo: RepoInfo) => string;
@@ -35,6 +40,8 @@ export const useRepoStore = create<RepoStore>()(
       repoInfo: null,
       commits: [],
       selectedCommits: [],
+      commitDiffs: {},
+      loadingDiffs: new Set(),
 
       // Persisted state
       repoHistory: [],
@@ -53,6 +60,28 @@ export const useRepoStore = create<RepoStore>()(
         })),
 
       clearSelection: () => set({ selectedCommits: [] }),
+
+      // Diff actions
+      loadCommitDiff: async (repoPath: string, hash: string) => {
+        const state = get();
+        if (state.commitDiffs[hash] || state.loadingDiffs.has(hash)) return;
+
+        set((s) => ({ loadingDiffs: new Set(s.loadingDiffs).add(hash) }));
+
+        try {
+          const { invoke } = await import('@tauri-apps/api/core');
+          const diff = await invoke<string>('get_commit_diff', { path: repoPath, hash });
+          set((s) => ({
+            commitDiffs: { ...s.commitDiffs, [hash]: diff },
+            loadingDiffs: new Set([...s.loadingDiffs].filter((h) => h !== hash)),
+          }));
+        } catch (error) {
+          console.error('Failed to load diff:', error);
+          set((s) => ({
+            loadingDiffs: new Set([...s.loadingDiffs].filter((h) => h !== hash)),
+          }));
+        }
+      },
 
       // History management
       addRepoToHistory: (repo: RepoInfo) => {

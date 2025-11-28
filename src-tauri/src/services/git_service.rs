@@ -166,6 +166,50 @@ impl GitService {
         Ok(diff_text)
     }
 
+    /// Gets diff summary for large commits (>10KB)
+    pub fn get_commit_diff_summary(&self, hash: &str) -> Result<String, String> {
+        let diff = self.get_commit_diff(hash)?;
+
+        const THRESHOLD: usize = 10 * 1024; // 10KB
+
+        if diff.len() <= THRESHOLD {
+            return Ok(diff);
+        }
+
+        // Parse diff to extract summary
+        let lines: Vec<&str> = diff.lines().collect();
+        let mut files: Vec<String> = Vec::new();
+        let mut insertions = 0;
+        let mut deletions = 0;
+
+        for line in &lines {
+            if line.starts_with("+++") || line.starts_with("---") {
+                if let Some(file) = line.split_whitespace().nth(1) {
+                    if file != "/dev/null" && !files.contains(&file.to_string()) {
+                        files.push(file.to_string());
+                    }
+                }
+            } else if line.starts_with('+') && !line.starts_with("+++") {
+                insertions += 1;
+            } else if line.starts_with('-') && !line.starts_with("---") {
+                deletions += 1;
+            }
+        }
+
+        let total_files = files.len();
+        let files_shown: Vec<String> = files.into_iter().take(20).collect();
+        let files_truncated = total_files.saturating_sub(20);
+
+        Ok(format!(
+            "⚠️ Large commit (summarized):\n- Modified files: {} total\n- Shown files: {}\n- Hidden files: {}\n- Changes: +{} -{}\n",
+            total_files,
+            files_shown.join(", "),
+            files_truncated,
+            insertions,
+            deletions
+        ))
+    }
+
     /// Gets repository statistics from the given commits
     pub fn get_stats(&self, commits: &[Commit]) -> Result<RepoStats, String> {
         let mut authors = HashSet::new();

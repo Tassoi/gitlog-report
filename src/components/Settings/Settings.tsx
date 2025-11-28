@@ -7,6 +7,7 @@ import { Moon, Sun, Monitor } from 'lucide-react';
 import LLMConfigTab from './LLMConfigTab';
 import TemplateManagement from './TemplateManagement';
 import ProxyConfigTab from './ProxyConfigTab';
+import AdvancedTab from './AdvancedTab';
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -19,12 +20,13 @@ const Settings = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="appearance" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="llm">LLM Config</TabsTrigger>
             <TabsTrigger value="proxy">Proxy</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
+            <TabsTrigger value="advanced">Advanced</TabsTrigger>
           </TabsList>
 
           <TabsContent value="appearance" className="space-y-4">
@@ -98,6 +100,10 @@ const Settings = () => {
                 Customize report templates and formatting. Coming soon in M4+.
               </p>
             </div>
+          </TabsContent>
+
+          <TabsContent value="advanced">
+            <AdvancedTab />
           </TabsContent>
         </Tabs>
       </CardContent>

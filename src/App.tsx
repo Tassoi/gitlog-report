@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { useState } from 'react';
 import { toast, Toaster } from 'sonner';
 import { Sidebar } from './components/Sidebar';
 import CommitList from './components/CommitList';
@@ -14,7 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart3,
   GitCommit,
-  FileText,
   History,
   FolderOpen,
   Settings as SettingsIcon,

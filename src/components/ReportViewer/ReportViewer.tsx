@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { FileText, Calendar, Loader2, Download } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Report, ReportTemplate, TemplateType } from '../../types';
+import type { Report, ReportTemplate } from '../../types';
 
 // 全局监听器实例，确保整个应用只有一个
 let globalListener: UnlistenFn | null = null;

@@ -7,6 +7,7 @@ pub mod storage_service;
 pub mod export_service;
 pub mod template_service;
 pub mod encryption_service;
+pub mod cache_service;
 
 pub use git_service::GitService;
 pub use llm_service::LLMService;

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useRepoStore } from '@/store/repoStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/EmptyState';
 import { FolderOpen, FileText, GitCommit, Users, TrendingUp, Calendar } from 'lucide-react';
 
 export function Dashboard() {
@@ -40,14 +41,12 @@ export function Dashboard() {
       </div>
 
       {!repoInfo ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <FolderOpen className="w-16 h-16 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No Repository Selected</h2>
-            <p className="text-muted-foreground mb-4">Open a repository to get started</p>
-            <Button onClick={() => navigate('/repos')}>Open Repository</Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<FolderOpen className="w-16 h-16" />}
+          title="No Repository Selected"
+          description="Open a repository to get started"
+          action={{ label: "Open Repository", onClick: () => navigate('/repos') }}
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

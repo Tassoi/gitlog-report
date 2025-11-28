@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { useRepoStore } from '@/store/repoStore';
 import { useGitRepo } from '@/hooks/useGitRepo';
 import CommitList from '@/components/CommitList';
 import FilterToolbar from '@/components/FilterToolbar';
+import { EmptyState } from '@/components/EmptyState';
+import { GitCommit } from 'lucide-react';
 
 export function Commits() {
+  const navigate = useNavigate();
   const { commits, repoInfo, setCommits } = useRepoStore();
   const { getCommits } = useGitRepo();
 
@@ -44,14 +48,33 @@ export function Commits() {
         <p className="text-muted-foreground">Browse and search commit history</p>
       </div>
 
-      <FilterToolbar
-        searchKeyword={searchKeyword}
-        onSearchChange={setSearchKeyword}
-        timeRange={timeRange}
-        onTimeRangeChange={handleTimeRangeChange}
-      />
+      {!repoInfo ? (
+        <EmptyState
+          icon={<GitCommit className="w-16 h-16" />}
+          title="No Repository Selected"
+          description="Open a repository to view commit history"
+          action={{ label: "Open Repository", onClick: () => navigate('/repos') }}
+        />
+      ) : (
+        <>
+          <FilterToolbar
+            searchKeyword={searchKeyword}
+            onSearchChange={setSearchKeyword}
+            timeRange={timeRange}
+            onTimeRangeChange={handleTimeRangeChange}
+          />
 
-      <CommitList commits={filteredCommits} />
+          {filteredCommits.length === 0 ? (
+            <EmptyState
+              icon={<GitCommit className="w-16 h-16" />}
+              title="No Commits Found"
+              description="Try adjusting your time range or search filters"
+            />
+          ) : (
+            <CommitList commits={filteredCommits} />
+          )}
+        </>
+      )}
     </div>
   );
 }

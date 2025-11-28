@@ -5,6 +5,7 @@ import { useRepoStore } from '../../store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Check, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 
 interface CommitListProps {
@@ -114,9 +115,11 @@ const CommitList = ({ commits }: CommitListProps) => {
                                 Loading diff...
                               </div>
                             ) : commitDiffs[commit.hash] ? (
-                              <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-60">
-                                {commitDiffs[commit.hash]}
-                              </pre>
+                              <ScrollArea className="max-h-[300px]">
+                                <pre className="text-xs bg-muted p-2 rounded">
+                                  {commitDiffs[commit.hash]}
+                                </pre>
+                              </ScrollArea>
                             ) : (
                               <p className="text-sm text-muted-foreground">No diff available</p>
                             )}

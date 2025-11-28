@@ -46,6 +46,7 @@ pub fn run() {
             // Config commands (M5: API Keys are encrypted automatically)
             config::save_config,
             config::load_config,
+            config::test_proxy,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

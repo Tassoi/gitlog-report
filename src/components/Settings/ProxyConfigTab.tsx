@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { invoke } from '@tauri-apps/api/core';
 
 const ProxyConfigTab = () => {
   const { config, isLoading, saveConfig } = useConfigStore();
@@ -19,6 +20,7 @@ const ProxyConfigTab = () => {
     httpsProxy: '',
   });
   const [hasChanges, setHasChanges] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
   // Sync with store when config loads
   useEffect(() => {
@@ -57,6 +59,20 @@ const ProxyConfigTab = () => {
     } catch (error) {
       toast.error('Failed to save proxy configuration');
       console.error('Save error:', error);
+    }
+  };
+
+  // Test proxy connection
+  const handleTestProxy = async () => {
+    setIsTesting(true);
+    try {
+      const proxyUrl = proxyConfig.enabled ? (proxyConfig.httpsProxy || proxyConfig.httpProxy) : null;
+      const result = await invoke<string>('test_proxy', { proxyUrl });
+      toast.success(result);
+    } catch (error) {
+      toast.error(error as string);
+    } finally {
+      setIsTesting(false);
     }
   };
 
@@ -118,6 +134,10 @@ const ProxyConfigTab = () => {
         <Button onClick={handleSave} disabled={isLoading || !hasChanges}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Proxy Configuration
+        </Button>
+        <Button onClick={handleTestProxy} disabled={isTesting} variant="outline">
+          {isTesting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Test Connection
         </Button>
       </div>
 

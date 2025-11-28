@@ -17,7 +17,7 @@ const RepoHistory = () => {
     const repo = repoHistory.find(r => r.id === repoId);
     if (!repo) return;
 
-    const toastId = toast.loading(`Loading repository ${repo.name}...`);
+
 
     try {
       setLoadingId(repoId);
@@ -36,7 +36,7 @@ const RepoHistory = () => {
         Math.floor(now / 1000)
       );
       setCommits(commits);
-      toast.success(`Successfully loaded ${repo.name}`, { id: toastId });
+
     } catch (error) {
       console.error('Failed to load repository:', error);
       toast.error(`Failed to load repository: ${error instanceof Error ? error.message : 'Unknown error'}`, { id: toastId });

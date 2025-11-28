@@ -21,7 +21,6 @@ import type { Report, ReportTemplate, TemplateType } from '../../types';
 
 // 全局监听器实例，确保整个应用只有一个
 let globalListener: UnlistenFn | null = null;
-let listenerSetupInProgress = false;
 
 const ReportViewer = () => {
   const { currentReport, isGenerating, setReport, setGenerating } = useReportStore();
@@ -37,34 +36,31 @@ const ReportViewer = () => {
 
   // Listen for streaming progress events from backend
   useEffect(() => {
-    if (globalListener || listenerSetupInProgress) {
-      return;
-    }
-
-    listenerSetupInProgress = true;
-    let isActive = true;
+    let cancelled = false;
 
     const setupListener = async () => {
+      if (globalListener) {
+        return;
+      }
+
       try {
         const unlisten = await listen<string>('report-generation-progress', (event) => {
           setStreamingContent((prev) => prev + event.payload);
         });
-        if (!isActive) {
+        if (cancelled) {
           unlisten();
           return;
         }
         globalListener = unlisten;
       } catch (error) {
         console.error('Failed to setup listener:', error);
-      } finally {
-        listenerSetupInProgress = false;
       }
     };
 
     setupListener();
 
     return () => {
-      isActive = false;
+      cancelled = true;
       if (globalListener) {
         globalListener();
         globalListener = null;

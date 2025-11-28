@@ -57,7 +57,7 @@ impl LLMProvider {
         }
     }
 
-    /// 提取 API Key（会清空原字段）
+    /// 提取 API Key
     pub fn take_api_key(&mut self) -> Option<String> {
         match self {
             Self::OpenAI { api_key, .. }

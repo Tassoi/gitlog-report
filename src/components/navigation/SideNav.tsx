@@ -30,8 +30,24 @@ export function SideNav() {
       </Button>
 
       <div className="p-4 border-b">
-        {!sidebarCollapsed && <h1 className="text-xl font-bold">GitLog AI</h1>}
-        {sidebarCollapsed && <h1 className="text-xl font-bold text-center">G</h1>}
+        {!sidebarCollapsed ? (
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo_round.png"
+              alt="GitLog AI"
+              className="h-9 w-9 rounded-lg "
+            />
+            <h1 className="text-xl font-bold">GitLog AI</h1>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <img
+              src="/logo_round.png"
+              alt="GitLog AI"
+              className="h-8 w-8 rounded-lg "
+            />
+          </div>
+        )}
       </div>
       <div className="flex-1 p-4 space-y-1">
         {navItems.map(({ to, icon: Icon, label }) => (

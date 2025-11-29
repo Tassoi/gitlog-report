@@ -1,4 +1,4 @@
-# ![Commitly Logo](public/logo_round.png)
+# <img src="public/logo_round.png" alt="Commitly Logo" width="120" />
 
 # Commitly
 

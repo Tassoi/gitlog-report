@@ -42,7 +42,6 @@ export function Dashboard() {
 
       {!repoInfo ? (
         <EmptyState
-          icon={<FolderOpen className="w-16 h-16" />}
           title="No Repository Selected"
           description="Open a repository to get started"
           action={{ label: "Open Repository", onClick: () => navigate('/repos') }}

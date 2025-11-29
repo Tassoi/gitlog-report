@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 
 interface EmptyStateProps {
-  icon: React.ReactNode;
   title: string;
   description: string;
   action?: {
@@ -10,10 +9,10 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({  title, description, action }: EmptyStateProps) {
   return (
     <div className="h-[520px] flex flex-col items-center justify-center gap-4">
-      <div className="text-muted-foreground">{icon}</div>
+      <img src="/logo_round.png" className='w-16 h-16'/>
       <div className="text-center">
         <h3 className="font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>

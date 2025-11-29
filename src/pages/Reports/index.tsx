@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { EmptyState } from '@/components/EmptyState';
-import { Plus, FileText } from 'lucide-react';
+import { Plus} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Reports() {
@@ -26,7 +26,6 @@ export function Reports() {
         <ScrollArea className="flex-1">
           {reportHistory.length === 0 ? (
             <EmptyState
-              icon={<FileText className="w-12 h-12" />}
               title="No Reports Yet"
               description="Generate your first report"
               action={{ label: "Generate Report", onClick: () => navigate('/reports/new') }}
@@ -60,7 +59,6 @@ export function Reports() {
           <ReportViewer />
         ) : (
           <EmptyState
-            icon={<FileText className="w-16 h-16" />}
             title="Select a Report"
             description="Choose a report from the list to view details"
           />

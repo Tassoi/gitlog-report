@@ -1,96 +1,71 @@
 # GitLog AI Reporter
 
-A desktop application built with Tauri (Rust backend) + React (TypeScript frontend) that analyzes Git repositories and generates weekly/monthly reports using LLMs (OpenAI/DeepSeek/local models).
+> 用 LLM 玩转你的 Git 提交，自动把碎碎念写成周报月报。轻量、调皮、够实用。
 
-## Status
+## 这玩意儿能干啥
 
-✅ **M1 (Project Skeleton) - Completed and Reviewed**
+- 一键扫仓库：自动拉取最近提交，支持多仓同开，随时切换。
+- 智能写报告：周报、月报随你选，模板可自定义，流式生成。
+- 导出随心：Markdown/HTML/PDF，一键保存给老板。
+- 轻量桌面端：Tauri + React，跑得快还省内存。
 
-All M1 review feedback has been addressed:
-- ✅ Rust-TypeScript data model alignment with serde rename
-- ✅ All commands have minimal mock implementations
-- ✅ Frontend skeleton fully wired (Zustand + hooks + components)
-- ✅ Tauri permissions and dialog plugin configured
-- ✅ Dependencies aligned (Zustand, Tailwind, lazy_static)
+## 快速上手
 
-See [M1_REVIEW_FIXES.md](M1_REVIEW_FIXES.md) for details.
+1. 安装依赖
 
-## Prerequisites
-
-- Node.js 20+ and npm
-- Rust 1.70+ (install from https://rustup.rs/)
-- Platform-specific dependencies:
-  - **Ubuntu**: `sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`
-  - **macOS**: Xcode Command Line Tools
-  - **Windows**: Microsoft Visual Studio C++ Build Tools
-
-## Development Setup
-
-1. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Run in development mode:
+2. 开发模式启动（会同时起前端和 Tauri）
+
 ```bash
 npm run tauri dev
 ```
 
-## Project Structure
+3. 选择仓库，点「生成报告」，看 AI 给你写总结。
+
+## 常用脚本
+
+- `npm run dev`：单跑前端
+- `npm run build`：打包前端
+- `npm run tauri build`：构建桌面应用
+- `npm run format`：Prettier 走一遍
+
+## 技术栈偷瞄
+
+- 前端：React + TypeScript + Zustand + Tailwind (shadcn/ui)
+- 后端：Rust + Tauri，串 OpenAI/Claude/Gemini 等兼容接口
+- 模板：Handlebars，自由改写周报/月报骨架
+
+## 目录速查
 
 ```
-gitlog-ai-reporter/
-├── src/                      # Frontend (React + TypeScript)
-│   ├── components/          # UI components
-│   │   ├── RepoSelector/
-│   │   ├── CommitList/
-│   │   ├── ReportViewer/
-│   │   └── Settings/
-│   ├── hooks/              # Custom React hooks
-│   ├── store/              # State management
-│   ├── types/              # TypeScript type definitions
-│   └── utils/              # Utility functions
-├── src-tauri/              # Backend (Rust + Tauri)
-│   ├── src/
-│   │   ├── commands/       # Tauri command handlers
-│   │   ├── services/       # Business logic
-│   │   ├── models/         # Data models
-│   │   └── utils/          # Utility functions
-│   └── Cargo.toml
-└── .github/workflows/      # CI/CD workflows
+src/                # 前端组件、hooks、store
+src-tauri/          # Rust 命令、服务、模板
+public/logo_round.png  # 本 README 提到的调皮 logo
+build/image.png        # 仪表盘截图（示例）
+build/image1.png       # 更多界面截图
+build/image2.png
+build/image3.png
 ```
 
-## Available Scripts
+## 界面长这样
 
-### Frontend
+![Dashboard - GitLog AI](build/image.png)
 
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Build frontend for production
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint errors
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+![Report - GitLog AI](build/image1.png)
 
-### Backend
+![Templates - GitLog AI](build/image2.png)
 
-- `cd src-tauri && cargo fmt` - Format Rust code
-- `cd src-tauri && cargo clippy` - Run Clippy linter
-- `cd src-tauri && cargo test` - Run tests
+![Settings - GitLog AI](build/image3.png)
 
-### Build
+## 小贴士
 
-- `npm run tauri build` - Build production app for current platform
+- 想切语言？右上角地球图标点一下。
+- 模板不合胃口？设置里复制一份再改。
+- LLM 卡住？检查代理和 API Key，或换个模型。
 
-## Recommended IDE Setup
+## 许可证
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-
-## Documentation
-
-- Architecture: See `../CLAUDE.md` and `../skelet.md`
-- Implementation Plan: See `../Plan.md`
-
-## License
-
-TBD
-
+Mit License （等老板拍板之前先别拿去卖哦）

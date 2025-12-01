@@ -1,73 +1,352 @@
-# <img src="public/logo_round.png" alt="Commitly Logo" width="120" />
-
 # Commitly
 
-> 用 LLM 玩转你的 Git 提交，自动把碎碎念写成周报月报。轻量、调皮、够实用。
+<div align="center">
 
-## 这玩意儿能干啥
+<img src="public/logo_round.png" alt="Commitly" width="120" />
 
-- 一键扫仓库：自动拉取最近提交，支持多仓同开，随时切换。
-- 智能写报告：周报、月报随你选，模板可自定义，流式生成。
-- 导出随心：Markdown/HTML/PDF，一键保存给老板。
-- 轻量桌面端：Tauri + React，跑得快还省内存。
+**Transform your Git commits into professional reports with AI**
 
-## 快速上手
+A lightweight desktop application that automatically generates weekly/monthly reports from your Git repositories using LLM technology.
 
-1. 安装依赖
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-1.5-FFC131?style=flat&logo=tauri&logoColor=white)](https://tauri.app/)
+[![Rust](https://img.shields.io/badge/Rust-1.70+-000000?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+English | [简体中文](README.zh-CN.md)
+
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#tech-stack) • [Development](#development) • [License](#license)
+
+</div>
+
+---
+
+## ✨ Features
+
+### 🚀 Core Capabilities
+
+- **Multi-Repository Support**: Manage multiple Git repositories simultaneously with automatic session restoration
+- **AI-Powered Reports**: Generate weekly/monthly reports using OpenAI, Claude, Gemini, or local LLM models
+- **Smart Commit Analysis**: Filter commits by author, date range, and repository
+- **Customizable Templates**: Create and manage report templates with Handlebars syntax
+- **Real-time Streaming**: Watch your reports being generated in real-time
+- **Multiple Export Formats**: Export reports as Markdown, HTML, or PDF
+
+### 🎨 User Experience
+
+- **Modern UI**: Built with shadcn/ui and Tailwind CSS for a clean, responsive interface
+- **Dark/Light Mode**: Full theme support with system preference detection
+- **Internationalization**: Support for English and Chinese (easily extensible)
+- **Global Repository Access**: Manage repositories from anywhere via the top bar
+- **Persistent State**: Automatically restores your last session on startup
+
+### 🔒 Security & Privacy
+
+- **Local-First**: All data stored locally on your machine
+- **Secure API Keys**: Credentials stored in system keyring (planned)
+- **No Telemetry**: Your data never leaves your computer unless you explicitly use cloud LLM services
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+- **Node.js** 18+ and npm
+- **Rust** 1.70+ (for building from source)
+- **Git** installed on your system
+
+### Quick Start
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/Tassoi/Commitly.git
+cd Commitly
+```
+
+2. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-2. 开发模式启动（会同时起前端和 Tauri）
+3. **Run in development mode**
 
 ```bash
 npm run tauri dev
 ```
 
-3. 选择仓库，点「生成报告」，看 AI 给你写总结。
+### Build for Production
 
-## 常用脚本
+```bash
+# Build the application
+npm run tauri build
 
-- `npm run dev`：单跑前端
-- `npm run build`：打包前端
-- `npm run tauri build`：构建桌面应用
-- `npm run format`：Prettier 走一遍
-
-## 技术栈偷瞄
-
-- 前端：React + TypeScript + Zustand + Tailwind (shadcn/ui)
-- 后端：Rust + Tauri，串 OpenAI/Claude/Gemini 等兼容接口
-- 模板：Handlebars，自由改写周报/月报骨架
-
-## 目录速查
-
-```
-src/                # 前端组件、hooks、store
-src-tauri/          # Rust 命令、服务、模板
-public/logo_round.png  # 本 README 提到的调皮 logo
-build/image.png        # 仪表盘截图（示例）
-build/image1.png       # 更多界面截图
-build/image2.png
-build/image3.png
+# Output will be in src-tauri/target/release/bundle/
+# - Windows: .msi / .exe
+# - macOS: .dmg / .app
+# - Linux: .deb / .AppImage
 ```
 
-## 界面长这样
+---
 
-![Dashboard - GitLog AI](build/image.png)
+## 🎯 Usage
 
-![Report - GitLog AI](build/image1.png)
+### Getting Started
 
-![Templates - GitLog AI](build/image2.png)
+1. **Open a Repository**
+   - Click the "Repository Management" button in the top bar
+   - Select "Open Repository" and choose your Git repository folder
+   - The app will load the last 30 days of commits
 
-![Settings - GitLog AI](build/image3.png)
+2. **Select Commits**
+   - Navigate to the "Commits" page
+   - Use filters to narrow down commits by author, date, or repository
+   - Select the commits you want to include in your report
 
-## 小贴士
+3. **Generate Report**
+   - Click "Generate Report" button
+   - Choose report type (Weekly/Monthly)
+   - Select a template
+   - Watch as AI generates your report in real-time
 
-- 想切语言？右上角地球图标点一下。
-- 模板不合胃口？设置里复制一份再改。
-- LLM 卡住？检查代理和 API Key，或换个模型。
+4. **Export & Share**
+   - View your generated report in the "Reports" page
+   - Export as Markdown, HTML, or PDF(TODO)
+   - Share with your team or manager(TODO)
 
-## 许可证
+### Configuration
 
-Mit License （等老板拍板之前先别拿去卖哦）
+#### LLM Settings
+
+Configure your preferred LLM provider in Settings:
+
+- **OpenAI**: GPT-4, GPT-3.5-turbo
+- **Anthropic**: Claude 3 Opus, Sonnet, Haiku
+- **Google**: Gemini Pro
+- **Local Models**: Ollama or llama.cpp server
+
+#### Custom Templates
+
+Create custom report templates:
+
+1. Go to Templates page
+2. Click "Create Template"
+3. Use Handlebars syntax with available variables:
+
+- Repositories involved: {{total_repos}}
+- Total commits: {{total_commits}}
+- Date range: {{date_range}}
+- Number of authors: {{unique_authors}}
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+- **Framework**: React 18 + TypeScript
+- **State Management**: Zustand with persistence
+- **UI Components**: shadcn/ui + Radix UI
+- **Styling**: Tailwind CSS
+- **Routing**: React Router v6
+- **Internationalization**: i18next + react-i18next
+- **Charts**: Recharts
+- **Date Handling**: date-fns
+
+### Backend
+
+- **Framework**: Tauri 1.5+
+- **Language**: Rust 1.70+
+- **Git Integration**: git2-rs
+- **HTTP Client**: reqwest
+- **Template Engine**: Handlebars
+- **Async Runtime**: tokio
+- **Serialization**: serde
+
+### Build Tools
+
+- **Frontend**: Vite
+- **Backend**: Cargo
+- **Linting**: Prettier
+- **Type Checking**: TypeScript
+
+---
+
+## 🔧 Development
+
+### Project Structure
+
+```
+Commitly/
+├── src/                          # Frontend source
+│   ├── components/              # React components
+│   │   ├── CommitList/         # Commit list with filters
+│   │   ├── navigation/         # TopBar, SideNav
+│   │   └── ui/                 # shadcn/ui components
+│   ├── pages/                   # Page components
+│   │   ├── Dashboard/          # Overview & statistics
+│   │   ├── Commits/            # Commit management
+│   │   ├── Reports/            # Report viewer
+│   │   ├── Templates/          # Template editor
+│   │   └── Settings/           # App configuration
+│   ├── store/                   # Zustand stores
+│   │   ├── repoStore.ts        # Repository state
+│   │   ├── reportStore.ts      # Report state
+│   │   └── uiStore.ts          # UI preferences
+│   ├── hooks/                   # Custom React hooks
+│   ├── i18n/                    # Internationalization
+│   │   └── locales/            # Translation files
+│   └── types/                   # TypeScript definitions
+│
+├── src-tauri/                   # Rust backend
+│   ├── src/
+│   │   ├── commands/           # Tauri command handlers
+│   │   │   ├── git.rs          # Git operations
+│   │   │   ├── llm.rs          # LLM integration
+│   │   │   ├── report.rs       # Report generation
+│   │   │   └── template.rs     # Template management
+│   │   ├── services/           # Business logic
+│   │   │   ├── git_service.rs  # Git repository handling
+│   │   │   ├── llm_service.rs  # LLM API calls
+│   │   │   └── template_service.rs
+│   │   ├── models/             # Data structures
+│   │   └── main.rs             # Application entry
+│   └── templates/              # Built-in report templates
+│
+├── public/                      # Static assets
+├── CLAUDE.md                    # Project guidelines for AI
+└── README.md                    # This file
+```
+
+### Available Scripts
+
+```bash
+# Development
+npm run dev              # Start Vite dev server only
+npm run tauri dev        # Start full Tauri app with hot reload
+
+# Building
+npm run build            # Build frontend for production
+npm run tauri build      # Build complete desktop application
+
+# Code Quality
+npm run format           # Format code with Prettier
+npm run type-check       # Run TypeScript compiler check
+
+# Rust
+cd src-tauri
+cargo check              # Check Rust code
+cargo test               # Run Rust tests
+cargo clippy             # Run Rust linter
+```
+
+### Adding New Features
+
+1. **Frontend Components**: Add to `src/components/` or `src/pages/`
+2. **Backend Commands**: Add to `src-tauri/src/commands/`
+3. **Translations**: Update `src/i18n/locales/zh.ts` and `en.ts`
+4. **Types**: Define in `src/types/index.ts`
+
+### Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📸 Screenshots
+
+### Dashboard
+
+![Dashboard](build/image.png)
+_Overview of repository statistics and recent activity_
+
+### Report Generation
+
+![Report Generation](build/image1.png)
+_Real-time AI-powered report generation with streaming_
+
+### Template Management
+
+![Templates](build/image2.png)
+_Create and customize report templates_
+
+### Settings
+
+![Settings](build/image3.png)
+_Configure LLM providers and application preferences_
+
+---
+
+## 🗺 Roadmap
+
+- [ ] **Security Enhancements**
+  - [ ] System keyring integration for API keys
+  - [ ] Encrypted configuration storage
+  - [ ] Secure file permissions
+
+- [ ] **Advanced Features**
+  - [ ] Commit diff analysis in reports
+  - [ ] Team collaboration features
+  - [ ] Report scheduling and automation
+  - [ ] Custom chart types in reports
+
+- [ ] **Integrations**
+  - [ ] GitHub/GitLab API integration
+  - [ ] Slack/Discord notifications
+  - [ ] Email report delivery
+
+- [ ] **Performance**
+  - [ ] Incremental Git parsing for large repos
+  - [ ] LLM response caching
+  - [ ] Virtual scrolling optimization
+
+---
+
+## 🐛 Known Issues
+
+- PDF export requires wkhtmltopdf to be installed separately
+- Large repositories (10k+ commits) may take time to load initially
+- Some LLM providers may have rate limits
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [Tauri](https://tauri.app/) - For the amazing desktop framework
+- [shadcn/ui](https://ui.shadcn.com/) - For beautiful UI components
+- [git2-rs](https://github.com/rust-lang/git2-rs) - For Git integration
+- All the open-source contributors who made this possible
+
+---
+
+## 📧 Contact
+
+- **Issues**: [GitHub Issues](https://github.com/Tassoi/Commitly/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Tassoi/Commitly/discussions)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by developers, for developers**
+
+⭐ Star this repo if you find it helpful!
+
+</div>

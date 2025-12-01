@@ -1,4 +1,4 @@
-// Core domain types for GitLog AI Reporter
+// Core domain types for Commitly
 
 export interface Commit {
   hash: string;

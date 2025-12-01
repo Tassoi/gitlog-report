@@ -337,7 +337,7 @@ fn build_html_document(report: &Report, html_content: &str) -> String {
     </div>
 
     <div class="footer">
-        <p>由 <strong>GitLog AI Reporter</strong> 生成</p>
+        <p>由 <strong>Commitly</strong> 生成</p>
     </div>
 </body>
 </html>"#,

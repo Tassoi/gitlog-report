@@ -1,4 +1,4 @@
-# Clippy configuration for GitLog AI Reporter
+# Clippy configuration for Commitly
 # See: https://doc.rust-lang.org/clippy/
 
 # Deny warnings in CI

@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "GitLog AI Reporter",
+        "title": "Commitly",
         "width": 1560,
         "height": 1120,
         "minWidth": 800,

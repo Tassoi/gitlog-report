@@ -7,7 +7,7 @@ export function NotFound() {
   return (
     <div className="flex min-h-[70vh]  ">
       <div className="p-8 flex flex-col items-center gap-6 text-center justify-center mx-auto">
-        <img src="/logo_round.png" alt="GitLog AI Reporter" className="h-40 w-40 object-contain" />
+        <img src="/logo_round.png" alt="Commitly" className="h-40 w-40 object-contain" />
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">404 - Page Not Found</h1>
           <p className="text-muted-foreground">

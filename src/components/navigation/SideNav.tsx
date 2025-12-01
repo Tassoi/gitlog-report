@@ -46,12 +46,12 @@ export function SideNav() {
       <div className="p-4 border-b">
         {!sidebarCollapsed ? (
           <div className="flex items-center gap-3">
-            <img src="/logo_round.png" alt="GitLog AI" className="h-9 w-9 rounded-lg " />
-            <h1 className="text-xl font-bold">GitLog AI</h1>
+            <img src="/logo_round.png" alt="Commitly" className="h-9 w-9 rounded-lg " />
+            <h1 className="text-xl font-bold">Commitly</h1>
           </div>
         ) : (
           <div className="flex justify-center">
-            <img src="/logo_round.png" alt="GitLog AI" className="h-8 w-8 rounded-lg " />
+            <img src="/logo_round.png" alt="Commitly" className="h-8 w-8 rounded-lg " />
           </div>
         )}
       </div>

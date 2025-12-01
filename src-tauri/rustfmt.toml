@@ -1,4 +1,4 @@
-# Rust formatting configuration for GitLog AI Reporter
+# Rust formatting configuration for Commitly
 # See: https://rust-lang.github.io/rustfmt/
 
 edition = "2021"

@@ -85,6 +85,26 @@ export default {
   最近开发速度: 'Recent development pace',
   当前工作空间: 'Current workspace',
 
+  // Dashboard Charts
+  提交数: 'Commits',
+  作者: 'Author',
+  未知作者: 'Unknown',
+  前5名作者: 'Top 5 authors',
+  按提交次数排序: 'Sorted by commit count',
+  前5名作者提交说明: 'Showing commit counts for top 5 authors',
+  最近30天提交趋势: 'Commit trend (last 30 days)',
+  每日提交量说明: 'Daily commits (including zero-commit days)',
+  提交类型分布: 'Commit type distribution',
+  基于提交信息前缀统计: 'Based on commit message prefixes',
+  提交类型统计说明: 'Counts by message prefix (feat/fix/docs/refactor/other)',
+  类型总数: 'Types: {{count}}',
+  总提交数统计: 'Total commits: {{count}}',
+  特性: 'Feature',
+  修复: 'Fix',
+  文档: 'Docs',
+  重构: 'Refactor',
+  其他: 'Other',
+
   // 空状态
   未选择仓库标题: 'No Repository Selected',
   未选择仓库描述: 'Open a repository to get started',

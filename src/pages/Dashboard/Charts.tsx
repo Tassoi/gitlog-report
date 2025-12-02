@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bar,
   BarChart,
@@ -70,17 +71,21 @@ export function commitTypes(commits: Commit[]) {
 
 // === 图表组件 ===
 export function CommitTrendChart({ commits }: { commits: Commit[] }) {
+  const { t } = useTranslation();
   const data = useMemo(() => groupCommitsByDay(commits, 30), [commits]);
-  const config = {
-    count: { label: 'Commits', color: 'var(--chart-3)' },
-  } satisfies ChartConfig;
+  const config = useMemo<ChartConfig>(
+    () => ({
+      count: { label: t('提交数'), color: 'var(--chart-3)' },
+    }),
+    [t]
+  );
 
   return (
     <Card>
       <CardHeader className="flex flex-col items-stretch border-b px-6 pt-4 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1  pb-3 sm:!py-0">
-          <CardTitle>最近 30 天提交趋势</CardTitle>
-          <CardDescription>每日提交量（包含 0 提交日）</CardDescription>
+          <CardTitle>{t('最近30天提交趋势')}</CardTitle>
+          <CardDescription>{t('每日提交量说明')}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="px-2 sm:p-6">
@@ -133,6 +138,7 @@ export function CommitTrendChart({ commits }: { commits: Commit[] }) {
 }
 
 export function AuthorRadialChart({ commits }: { commits: Commit[] }) {
+  const { t } = useTranslation();
   const top = useMemo(() => topAuthors(commits, 5), [commits]);
   const palette = [
     'var(--chart-1)',
@@ -142,21 +148,24 @@ export function AuthorRadialChart({ commits }: { commits: Commit[] }) {
     'var(--chart-5)',
   ];
   const chartData = top.map((item, idx) => ({
-    author: item.author || 'Unknown',
+    author: item.author || t('未知作者'),
     commits: item.count,
     fill: palette[idx % palette.length],
   }));
 
-  const chartConfig = {
-    commits: { label: 'Commits' },
-    author: { label: 'Author' },
-  } satisfies ChartConfig;
+  const chartConfig = useMemo<ChartConfig>(
+    () => ({
+      commits: { label: t('提交数') },
+      author: { label: t('作者') },
+    }),
+    [t]
+  );
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Top 5 作者</CardTitle>
-        <CardDescription>按提交次数排序</CardDescription>
+        <CardTitle>{t('前5名作者')}</CardTitle>
+        <CardDescription>{t('按提交次数排序')}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[280px]">
@@ -170,7 +179,7 @@ export function AuthorRadialChart({ commits }: { commits: Commit[] }) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="text-muted-foreground leading-none">显示前 5 名作者的提交次数</div>
+        <div className="text-muted-foreground leading-none">{t('前5名作者提交说明')}</div>
         <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-2">
           {chartData.map((item) => (
             <div
@@ -194,15 +203,19 @@ export function AuthorRadialChart({ commits }: { commits: Commit[] }) {
 }
 
 export function CommitTypeChart({ commits }: { commits: Commit[] }) {
+  const { t } = useTranslation();
   const data = useMemo(() => commitTypes(commits), [commits]);
-  const config = {
-    commits: { label: 'Commits', color: 'var(--chart-1)' },
-    feat: { label: 'feat', color: 'var(--chart-1)' },
-    fix: { label: 'fix', color: 'var(--chart-2)' },
-    docs: { label: 'docs', color: 'var(--chart-3)' },
-    refactor: { label: 'refactor', color: 'var(--chart-4)' },
-    other: { label: 'other', color: 'var(--chart-5)' },
-  } satisfies ChartConfig;
+  const config = useMemo<ChartConfig>(
+    () => ({
+      commits: { label: t('提交数'), color: 'var(--chart-1)' },
+      feat: { label: t('特性'), color: 'var(--chart-1)' },
+      fix: { label: t('修复'), color: 'var(--chart-2)' },
+      docs: { label: t('文档'), color: 'var(--chart-3)' },
+      refactor: { label: t('重构'), color: 'var(--chart-4)' },
+      other: { label: t('其他'), color: 'var(--chart-5)' },
+    }),
+    [t]
+  );
 
   const pieData = data.map((item, idx) => ({
     type: item.type,
@@ -213,8 +226,8 @@ export function CommitTypeChart({ commits }: { commits: Commit[] }) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>提交类型分布</CardTitle>
-        <CardDescription>基于 message 前缀统计</CardDescription>
+        <CardTitle>{t('提交类型分布')}</CardTitle>
+        <CardDescription>{t('基于提交信息前缀统计')}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -223,17 +236,22 @@ export function CommitTypeChart({ commits }: { commits: Commit[] }) {
         >
           <PieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="type" />} />
-            <Pie data={pieData} dataKey="commits" label nameKey="type" />
+            <Pie
+              data={pieData}
+              dataKey="commits"
+              label={(entry) =>
+                (config[entry.type as keyof typeof config]?.label as string) ?? entry.type
+              }
+              nameKey="type"
+            />
           </PieChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="text-muted-foreground leading-none">
-          按消息前缀（feat/fix/docs/refactor/other）统计提交数量
-        </div>
+        <div className="text-muted-foreground leading-none">{t('提交类型统计说明')}</div>
         <div className="flex w-full items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span>类型总数：{pieData.length}</span>
-          <span>总提交：{pieData.reduce((acc, cur) => acc + cur.commits, 0)}</span>
+          <span>{t('类型总数', { count: pieData.length })}</span>
+          <span>{t('总提交数统计', { count: pieData.reduce((acc, cur) => acc + cur.commits, 0) })}</span>
         </div>
       </CardFooter>
     </Card>

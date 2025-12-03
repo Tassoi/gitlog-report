@@ -1,0 +1,15 @@
+#.cursorrules
+When generating Git commit messages,follow these rules:
+1.Use the Conventional Commits format:<type>(<scope>):<description>
+2.Supported types (use emoji prefix):
+-feat:New feature
+·-fix:Bug fix
+docs:Documentation update
+style:Code style changes
+-refactor:Code refactoring
+test:Test-related changes
+-chore:Build/tools changes
+3.Keep the summary line under 50 characters
+4.Use imperative mood (e.g.,"Add feature"instead of "Added feature")
+5.Include a body with bullet points for detailed changes
+6.Generate messages in Chinese

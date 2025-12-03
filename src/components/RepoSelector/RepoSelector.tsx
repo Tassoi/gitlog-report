@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useGitRepo } from '../../hooks/useGitRepo';
 import { useRepoStore } from '../../store';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 const RepoSelector = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +24,7 @@ const RepoSelector = () => {
       const path = await selectRepository();
       if (!path) return;
 
-      toastId = toast.loading('Opening repository...');
+      toastId = toast.loading(t('正在打开仓库'));
 
       const info = await openRepository(path);
       setRepoInfo(info);
@@ -40,11 +42,14 @@ const RepoSelector = () => {
       );
       setCommits(commits);
 
-      toast.success(`Successfully opened ${info.name}`, { id: toastId });
+      toast.success(t('已添加仓库', { name: info.name, count: commits.length }), { id: toastId });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to open repository';
+      const errorMessage = err instanceof Error ? err.message : t('打开仓库失败', { error: '' });
       setError(errorMessage);
-      toast.error(`Failed to open repository: ${errorMessage}`, { id: toastId });
+      toast.error(
+        t('打开仓库失败', { error: err instanceof Error ? err.message : t('未知错误') }),
+        { id: toastId }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +58,7 @@ const RepoSelector = () => {
   return (
     <div className="flex flex-wrap items-center gap-4">
       <Button onClick={handleSelectRepo} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Open Repository'}
+        {isLoading ? t('加载中') : t('打开仓库')}
       </Button>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
@@ -65,7 +70,9 @@ const RepoSelector = () => {
             <p className="max-w-[300px] truncate text-xs text-muted-foreground">{repoInfo.path}</p>
           </div>
           <Badge variant="secondary">{repoInfo.branch}</Badge>
-          <Badge variant="outline">{repoInfo.totalCommits} commits</Badge>
+          <Badge variant="outline">
+            {t('个提交', { count: repoInfo.totalCommits })}
+          </Badge>
         </div>
       )}
     </div>

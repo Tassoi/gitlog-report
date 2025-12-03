@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Home,
   GitCommit,
@@ -13,14 +14,15 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function SideNav() {
+  const { t } = useTranslation();
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
 
   const navItems = [
-    { to: '/', icon: Home, label: 'Dashboard' },
-    { to: '/commits', icon: GitCommit, label: 'Commits' },
-    { to: '/reports', icon: FileText, label: 'Reports' },
-    { to: '/templates', icon: FileCode, label: 'Templates' },
-    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: '/', icon: Home, label: t('仪表盘') },
+    { to: '/commits', icon: GitCommit, label: t('提交') },
+    { to: '/reports', icon: FileText, label: t('报告') },
+    { to: '/templates', icon: FileCode, label: t('模板') },
+    { to: '/settings', icon: Settings, label: t('设置') },
   ];
 
   return (

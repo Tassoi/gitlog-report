@@ -118,6 +118,13 @@ export default {
   文档: 'Docs',
   重构: 'Refactor',
   其他: 'Other',
+  没有可导出的报告: 'No report to export',
+  导出失败: 'Export failed: {{error}}',
+  报告历史: 'Report History',
+  最近生成的报告: 'Recently generated reports',
+  导出为Markdown: 'Export as Markdown',
+  导出为HTML: 'Export as HTML',
+  暂无报告提示: 'No report yet. Go to the Commits page to generate one.',
 
   // 空状态
   未选择仓库标题: 'No Repository Selected',

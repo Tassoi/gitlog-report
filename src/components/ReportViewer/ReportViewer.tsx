@@ -1,4 +1,5 @@
 import { useReportStore } from '../../store';
+import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,11 +12,12 @@ import ReportHistory from '@/components/Sidebar/ReportHistory';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 
 const ReportViewer = () => {
+  const { t } = useTranslation();
   const { currentReport } = useReportStore();
 
   const handleExport = async (format: 'markdown' | 'html' | 'pdf') => {
     if (!currentReport) {
-      toast.error('没有可导出的报告');
+      toast.error(t('没有可导出的报告'));
       return;
     }
 
@@ -37,7 +39,9 @@ const ReportViewer = () => {
       toast.success(message);
     } catch (err) {
       console.error('Export failed:', err);
-      toast.error(`导出失败: ${err instanceof Error ? err.message : String(err)}`);
+      toast.error(
+        t('导出失败', { error: err instanceof Error ? err.message : String(err) })
+      );
     }
   };
 
@@ -46,8 +50,8 @@ const ReportViewer = () => {
       <div className="xl:sticky xl:top-4 self-start">
         <Card className="h-full">
           <CardHeader>
-            <CardTitle>Report History</CardTitle>
-            <CardDescription>Recently generated reports</CardDescription>
+            <CardTitle>{t('报告历史')}</CardTitle>
+            <CardDescription>{t('最近生成的报告')}</CardDescription>
           </CardHeader>
           <CardContent className="h-[80vh] p-0">
             <ReportHistory />
@@ -66,7 +70,7 @@ const ReportViewer = () => {
                     <CardTitle className="text-lg">{currentReport.name}</CardTitle>
                   </div>
                   <CardDescription>
-                    Based on {currentReport.commits.length} commit(s)
+                    {t('基于选中的提交', { count: currentReport.commits.length })}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -74,7 +78,7 @@ const ReportViewer = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleExport('markdown')}
-                    title="导出为 Markdown"
+                    title={t('导出为Markdown')}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Markdown
@@ -83,7 +87,7 @@ const ReportViewer = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleExport('html')}
-                    title="导出为 HTML"
+                    title={t('导出为HTML')}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     HTML
@@ -99,9 +103,7 @@ const ReportViewer = () => {
         ) : (
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                No report generated yet. Go to Commits page to generate a report.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('暂无报告提示')}</p>
             </CardContent>
           </Card>
         )}

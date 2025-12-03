@@ -1,21 +1,24 @@
-import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 
-interface FeishuPayload {
-  msg_type: 'post';
-  content: {
-    post: {
-      zh_cn: {
-        title: string;
-        content: Array<Array<{ tag: 'text' | 'a'; text?: string; href?: string }>>;
-      };
-    };
+interface TenantAccessTokenResponse {
+  code: number;
+  msg: string;
+  tenant_access_token: string;
+  expire: number;
+}
+
+interface SendMessageResponse {
+  code: number;
+  msg: string;
+  data?: {
+    message_id: string;
   };
 }
 
 interface PushOptions {
-  webhookUrl: string;
-  secret?: string;
+  appId: string;
+  appSecret: string;
+  userId: string;
   title: string;
   summary: string;
   reportPath: string;
@@ -29,73 +32,111 @@ async function readFileSafe(path: string): Promise<string> {
   }
 }
 
-function buildFeishuPayload(options: PushOptions, reportSnippet: string): FeishuPayload {
-  const lines = reportSnippet.split('\n');
-  const content: FeishuPayload['content']['post']['zh_cn']['content'] = lines.map((line) => [
+// 获取 tenant_access_token
+async function getTenantAccessToken(appId: string, appSecret: string): Promise<string> {
+  const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      app_id: appId,
+      app_secret: appSecret,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`获取 tenant_access_token 失败: ${response.status}`);
+  }
+
+  const data = (await response.json()) as TenantAccessTokenResponse;
+  if (data.code !== 0) {
+    throw new Error(`获取 tenant_access_token 失败: ${data.msg}`);
+  }
+
+  return data.tenant_access_token;
+}
+
+// 构建富文本消息内容
+function buildPostContent(title: string, reportContent: string) {
+  const lines = reportContent.split('\n');
+  const content: Array<Array<{ tag: string; text?: string; href?: string }>> = lines.map((line) => [
     { tag: 'text', text: line },
   ]);
 
   return {
-    msg_type: 'post',
-    content: {
-      post: {
-        zh_cn: {
-          title: options.title,
-          content,
-        },
-      },
+    zh_cn: {
+      title,
+      content,
     },
   };
 }
 
-function signRequest(secret: string, timestamp: number): string {
-  const stringToSign = `${timestamp}\n${secret}`;
-  const hmac = crypto.createHmac('sha256', stringToSign);
-  const digest = hmac.digest('base64');
-  return digest;
-}
+// 发送消息到个人
+async function sendMessage(token: string, userId: string, title: string, reportContent: string): Promise<void> {
+  const postContent = buildPostContent(title, reportContent);
 
-async function pushToFeishu(options: PushOptions) {
-  const reportContent = await readFileSafe(options.reportPath);
-  const snippet = options.summary || reportContent;
-  const payload = buildFeishuPayload(options, snippet);
-
-  const timestamp = Math.floor(Date.now() / 1000);
-  const body: Record<string, unknown> = { ...payload };
-
-  if (options.secret) {
-    body.timestamp = timestamp.toString();
-    body.sign = signRequest(options.secret, timestamp);
-  }
-
-  const response = await fetch(options.webhookUrl, {
+  const response = await fetch(`https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      receive_id: userId,
+      msg_type: 'post',
+      content: JSON.stringify({ post: postContent }),
+    }),
   });
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`飞书推送失败：${response.status} ${text}`);
+    throw new Error(`发送消息失败: ${response.status} ${text}`);
   }
+
+  const data = (await response.json()) as SendMessageResponse;
+  if (data.code !== 0) {
+    throw new Error(`发送消息失败: ${data.msg}`);
+  }
+}
+
+async function pushToFeishu(options: PushOptions) {
+  // 1. 获取 tenant_access_token
+  console.log('正在获取 tenant_access_token...');
+  const token = await getTenantAccessToken(options.appId, options.appSecret);
+
+  // 2. 读取周报内容
+  const reportContent = await readFileSafe(options.reportPath);
+  const content = options.summary || reportContent;
+
+  // 3. 发送消息
+  console.log('正在发送消息到飞书...');
+  await sendMessage(token, options.userId, options.title, content);
 
   console.log('✅ 飞书推送成功');
 }
 
 async function main() {
-  const webhookUrl = process.env.FEISHU_WEBHOOK_URL;
-  if (!webhookUrl) {
-    throw new Error('缺少 FEISHU_WEBHOOK_URL 环境变量');
+  const appId = process.env.FEISHU_APP_ID;
+  const appSecret = process.env.FEISHU_APP_SECRET;
+  const userId = process.env.FEISHU_USER_OPEN_ID;
+
+  if (!appId) {
+    throw new Error('缺少 FEISHU_APP_ID 环境变量');
+  }
+  if (!appSecret) {
+    throw new Error('缺少 FEISHU_APP_SECRET 环境变量');
+  }
+  if (!userId) {
+    throw new Error('缺少 FEISHU_USER_OPEN_ID 环境变量');
   }
 
   const reportPath = process.env.REPORT_FILE ?? 'dist/report-weekly.md';
   const title = process.env.REPORT_TITLE ?? '自动化周报';
   const summary = process.env.REPORT_SUMMARY ?? '';
-  const secret = process.env.FEISHU_SECRET;
 
   await pushToFeishu({
-    webhookUrl,
-    secret,
+    appId,
+    appSecret,
+    userId,
     title,
     summary,
     reportPath,

@@ -73,12 +73,13 @@ jobs:
           scripts/generate-weekly-report.sh
       # - name: Push to Feishu
       #   env:
-      #     FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-      #     FEISHU_SECRET: ${{ secrets.FEISHU_SECRET }}
+      #     FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+      #     FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+      #     FEISHU_USER_OPEN_ID: ${{ secrets.FEISHU_USER_OPEN_ID }}
       #     REPORT_FILE: artifacts/report-weekly.md
       #     REPORT_TITLE: '自动周报'
       #     REPORT_SUMMARY: ''
-      #   run: node scripts/push-feishu.ts
+      #   run: npx tsx scripts/push-feishu.ts
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-report

@@ -363,7 +363,7 @@ const CommitList = ({
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 25,
+        pageSize: 10,
       },
     },
   });
@@ -521,17 +521,21 @@ const CommitList = ({
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium">{t('每页行数')}</p>
-                  <select
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => table.setPageSize(Number(e.target.value))}
-                    className="h-8 w-[70px] rounded-md border border-input bg-background px-2 text-sm"
+                  <Select
+                    value={String(table.getState().pagination.pageSize)}
+                    onValueChange={(value) => table.setPageSize(Number(value))}
                   >
-                    {[10, 25, 50, 100].map((pageSize) => (
-                      <option key={pageSize} value={pageSize}>
-                        {pageSize}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="h-8 w-[96px] justify-between text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {[10, 25, 50, 100].map((pageSize) => (
+                        <SelectItem key={pageSize} value={String(pageSize)}>
+                          {pageSize}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex w-[100px] items-center justify-center text-sm font-medium">

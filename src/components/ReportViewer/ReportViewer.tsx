@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Download } from 'lucide-react';
+import { Copy, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportHistory from '@/components/Sidebar/ReportHistory';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
@@ -14,6 +14,28 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 const ReportViewer = () => {
   const { t } = useTranslation();
   const { currentReport } = useReportStore();
+
+  const handleCopy = async () => {
+    if (!currentReport) {
+      toast.error(t('没有可复制的报告'));
+      return;
+    }
+
+    if (!navigator?.clipboard?.writeText) {
+      toast.error(t('当前环境不支持复制'));
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentReport.content);
+      toast.success(t('已复制到剪贴板'));
+    } catch (err) {
+      console.error('Copy failed:', err);
+      toast.error(
+        t('复制失败', { error: err instanceof Error ? err.message : String(err) })
+      );
+    }
+  };
 
   const handleExport = async (format: 'markdown' | 'html' | 'pdf') => {
     if (!currentReport) {
@@ -74,6 +96,15 @@ const ReportViewer = () => {
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCopy}
+                    title={t('复制周报')}
+                  >
+                    <Copy className="mr-2 h-4 w-4" />
+                    {t('复制')}
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"

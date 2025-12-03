@@ -1,7 +1,7 @@
 // LLM service - handles AI model interactions with streaming support
 
-use crate::models::{Commit, LLMProvider, ProxyConfig};
-use anyhow::{Context, Result};
+use crate::models::{LLMProvider, ProxyConfig};
+use anyhow::Result;
 use futures::StreamExt;
 use reqwest::Client;
 use serde_json::{json, Value};
@@ -36,7 +36,7 @@ impl LLMService {
         Self { client, provider }
     }
 
-    /// Generates a report using LLM with streaming progress (with caching)
+    /// Generates a report using LLM with streaming progress
     pub async fn generate_report_streaming(
         &self,
         prompt: String,
@@ -46,41 +46,13 @@ impl LLMService {
             .await
     }
 
-    /// Generates a report with template_id for cache key
+    /// Generates a report with template_id (currently unused, kept for API compatibility)
     pub async fn generate_report_streaming_with_template(
         &self,
         prompt: String,
-        template_id: String,
+        _template_id: String,
         app: AppHandle,
     ) -> Result<String, String> {
-        use crate::services::cache_service;
-
-        // Generate cache key
-        let (provider_type, model) = match &self.provider {
-            LLMProvider::OpenAI { model, .. } => ("openai", model.as_str()),
-            LLMProvider::Claude { model, .. } => ("claude", model.as_str()),
-            LLMProvider::Gemini { model, .. } => ("gemini", model.as_str()),
-        };
-
-        let cache_key = cache_service::hash_llm_request(
-            provider_type,
-            model,
-            0.7, // Fixed temperature
-            &template_id,
-            &prompt,
-        );
-
-        // Check cache first
-        if let Some(cached_content) = cache_service::get_cached_llm_response(&cache_key).await {
-            println!("✅ LLM cache hit for key: {}", &cache_key[..16]);
-            // Emit cached response as streaming events
-            self.emit_cached_response_streaming(&app, &cached_content).await;
-            return Ok(cached_content);
-        }
-
-        println!("❌ LLM cache miss for key: {}", &cache_key[..16]);
-
-        // Cache miss, call API
         let content = match &self.provider {
             LLMProvider::OpenAI {
                 base_url,
@@ -107,23 +79,7 @@ impl LLMService {
                     .await?
             }
         };
-
-        // Cache the response
-        cache_service::cache_llm_response(cache_key, content.clone()).await;
-
         Ok(content)
-    }
-
-    /// Emits cached response as streaming events
-    async fn emit_cached_response_streaming(&self, app: &AppHandle, content: &str) {
-        // Split content into chunks and emit progressively
-        const CHUNK_SIZE: usize = 50;
-        for chunk in content.as_bytes().chunks(CHUNK_SIZE) {
-            if let Ok(chunk_str) = std::str::from_utf8(chunk) {
-                let _ = app.emit("report-generation-progress", chunk_str);
-                tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-            }
-        }
     }
 
     /// OpenAI compatible API (OpenAI, DeepSeek, local models, etc.)

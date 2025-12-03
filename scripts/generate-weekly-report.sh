@@ -16,7 +16,7 @@ for repo in $REPO_PATHS; do
   args+=(--repo "$repo")
 done
 
-cargo run --quiet --bin report-cli -- \
+cargo run --quiet --manifest-path "$WORKDIR/src-tauri/Cargo.toml" --bin report-cli -- \
   "${args[@]}" \
   --from "$FROM_DATE" \
   --to "$TO_DATE" \

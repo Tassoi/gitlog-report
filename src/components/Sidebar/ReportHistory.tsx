@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileText } from 'lucide-react';
 import { useReportStore } from '../../store';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 const ReportHistory = () => {
+  const { t } = useTranslation();
   const {
     reportHistory,
     currentReportId,
@@ -41,7 +43,7 @@ const ReportHistory = () => {
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -51,8 +53,8 @@ const ReportHistory = () => {
   if (reportHistory.length === 0) {
     return (
       <div className="p-4 text-center">
-        <p className="text-sm text-muted-foreground">No reports yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">Generate a report to get started</p>
+        <p className="text-sm text-muted-foreground">{t('暂无报告')}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t('去提交页生成报告')}</p>
       </div>
     );
   }
@@ -111,7 +113,7 @@ const ReportHistory = () => {
                         </p>
                         <span className="text-xs text-muted-foreground">•</span>
                         <p className="text-xs text-muted-foreground">
-                          {report.commits.length} commits
+                          {t('个提交', { count: report.commits.length })}
                         </p>
                       </div>
                     </div>
@@ -125,7 +127,7 @@ const ReportHistory = () => {
                       setRenameValue(report.name);
                     }}
                   >
-                    Rename
+                    {t('重命名')}
                   </ContextMenuItem>
                   <ContextMenuItem
                     onClick={() => {
@@ -133,11 +135,11 @@ const ReportHistory = () => {
                       setEditValue(report.content);
                     }}
                   >
-                    Edit
+                    {t('编辑')}
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                   <ContextMenuItem onClick={() => removeReportFromHistory(report.id)}>
-                    Delete
+                    {t('删除')}
                   </ContextMenuItem>
                 </ContextMenuContent>
               </ContextMenu>
@@ -149,20 +151,20 @@ const ReportHistory = () => {
       <Dialog open={!!renameId} onOpenChange={(open) => !open && setRenameId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rename report</DialogTitle>
+            <DialogTitle>{t('重命名报告')}</DialogTitle>
           </DialogHeader>
           <Input
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
-            placeholder="New name"
+            placeholder={t('新名称')}
             autoFocus
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setRenameId(null)}>
-              Cancel
+              {t('取消')}
             </Button>
             <Button onClick={handleRenameSubmit} disabled={!renameValue.trim()}>
-              Save
+              {t('保存')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -171,7 +173,7 @@ const ReportHistory = () => {
       <Dialog open={!!editId} onOpenChange={(open) => !open && setEditId(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Edit report content</DialogTitle>
+            <DialogTitle>{t('编辑报告内容')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             <textarea
@@ -182,10 +184,10 @@ const ReportHistory = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditId(null)}>
-              Cancel
+              {t('取消')}
             </Button>
             <Button onClick={handleEditSubmit} disabled={!editValue.trim()}>
-              Save
+              {t('保存')}
             </Button>
           </DialogFooter>
         </DialogContent>

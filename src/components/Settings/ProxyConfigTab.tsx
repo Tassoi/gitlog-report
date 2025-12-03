@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useConfigStore } from '@/store';
 import type { ProxyConfig } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { toast } from 'sonner';
 import { invoke } from '@tauri-apps/api/core';
 
 const ProxyConfigTab = () => {
+  const { t } = useTranslation();
   const { config, isLoading, saveConfig } = useConfigStore();
 
   // Local form state
@@ -57,10 +59,10 @@ const ProxyConfigTab = () => {
       };
       console.log('Saving proxy config:', configToSave);
       await saveConfig(configToSave);
-      toast.success('Proxy configuration saved successfully');
+      toast.success(t('保存代理配置成功'));
       setHasChanges(false);
     } catch (error) {
-      toast.error('Failed to save proxy configuration');
+      toast.error(t('保存代理配置失败'));
       console.error('Save error:', error);
     }
   };
@@ -84,8 +86,8 @@ const ProxyConfigTab = () => {
       {/* Enable Proxy */}
       <div className="flex items-center justify-between space-x-2">
         <div className="space-y-0.5">
-          <Label htmlFor="proxy-enabled">Enable Proxy</Label>
-          <p className="text-sm text-muted-foreground">Use proxy server for LLM API requests</p>
+          <Label htmlFor="proxy-enabled">{t('启用代理')}</Label>
+          <p className="text-sm text-muted-foreground">{t('代理说明')}</p>
         </div>
         <Switch
           id="proxy-enabled"
@@ -98,7 +100,7 @@ const ProxyConfigTab = () => {
 
       {/* HTTP Proxy */}
       <div className="space-y-2">
-        <Label htmlFor="http-proxy">HTTP Proxy (Optional)</Label>
+        <Label htmlFor="http-proxy">{t('HTTP代理可选')}</Label>
         <Input
           id="http-proxy"
           type="url"
@@ -107,14 +109,12 @@ const ProxyConfigTab = () => {
           placeholder="http://proxy.example.com:8080"
           disabled={!proxyConfig.enabled}
         />
-        <p className="text-sm text-muted-foreground">
-          HTTP proxy URL (e.g., http://proxy.example.com:8080)
-        </p>
+        <p className="text-sm text-muted-foreground">{t('HTTP代理说明')}</p>
       </div>
 
       {/* HTTPS Proxy */}
       <div className="space-y-2">
-        <Label htmlFor="https-proxy">HTTPS Proxy (Recommended)</Label>
+        <Label htmlFor="https-proxy">{t('HTTPS代理推荐')}</Label>
         <Input
           id="https-proxy"
           type="url"
@@ -123,10 +123,7 @@ const ProxyConfigTab = () => {
           placeholder="https://proxy.example.com:8080"
           disabled={!proxyConfig.enabled}
         />
-        <p className="text-sm text-muted-foreground">
-          HTTPS proxy URL for secure connections. Falls back to environment variables (HTTPS_PROXY,
-          https_proxy) if not set.
-        </p>
+        <p className="text-sm text-muted-foreground">{t('HTTPS代理说明')}</p>
       </div>
 
       <Separator />
@@ -135,20 +132,20 @@ const ProxyConfigTab = () => {
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={isLoading || !hasChanges}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save Proxy Configuration
+          {t('保存代理配置')}
         </Button>
         <Button onClick={handleTestProxy} disabled={isTesting} variant="outline">
           {isTesting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Test Connection
+          {t('测试代理连接')}
         </Button>
       </div>
 
       <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
-        <p className="font-medium mb-1">Proxy Priority:</p>
+        <p className="font-medium mb-1">{t('代理优先级')}</p>
         <ul className="list-disc list-inside space-y-1">
-          <li>UI Configuration (this setting) takes highest priority</li>
-          <li>Environment variables (HTTPS_PROXY, https_proxy) are used as fallback</li>
-          <li>If both are empty, direct connection is used</li>
+          <li>{t('代理优先级1')}</li>
+          <li>{t('代理优先级2')}</li>
+          <li>{t('代理优先级3')}</li>
         </ul>
       </div>
     </div>

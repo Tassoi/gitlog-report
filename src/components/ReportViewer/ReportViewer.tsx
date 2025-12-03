@@ -8,8 +8,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
-import ReportHistory from '@/components/Sidebar/ReportHistory';
+import { ReportHistory } from '@/components/Sidebar';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { EmptyState } from '../EmptyState';
+
+
 
 const ReportViewer = () => {
   const { t } = useTranslation();
@@ -101,11 +104,10 @@ const ReportViewer = () => {
             </ScrollArea>
           </Card>
         ) : (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <p className="text-sm text-muted-foreground">{t('暂无报告提示')}</p>
-            </CardContent>
-          </Card>
+            <EmptyState
+              title={t('暂无报告提示')}
+              description={t('暂无报告描述')}
+            />
         )}
       </Card>
     </div>

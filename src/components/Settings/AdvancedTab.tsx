@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -12,6 +13,7 @@ interface CacheStats {
 }
 
 const AdvancedTab = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<CacheStats | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,10 +34,10 @@ const AdvancedTab = () => {
     setLoading(true);
     try {
       await invoke('clear_llm_cache');
-      toast.success('LLM cache cleared successfully');
+      toast.success(t('清理LLM缓存成功'));
       await loadStats();
     } catch (error) {
-      toast.error('Failed to clear LLM cache');
+      toast.error(t('清理LLM缓存失败'));
     } finally {
       setLoading(false);
     }
@@ -45,31 +47,29 @@ const AdvancedTab = () => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>LLM Response Cache</CardTitle>
-          <CardDescription>
-            Cached LLM responses reduce API costs and improve performance
-          </CardDescription>
+          <CardTitle>{t('LLM响应缓存')}</CardTitle>
+          <CardDescription>{t('缓存描述')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {stats && (
             <>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Cached Responses</p>
+                  <p className="text-muted-foreground">{t('已缓存响应')}</p>
                   <p className="text-2xl font-bold">{stats.llm_count}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Memory Usage</p>
+                  <p className="text-muted-foreground">{t('内存占用')}</p>
                   <p className="text-2xl font-bold">{stats.llm_memory_mb.toFixed(2)} MB</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Hit Rate</p>
+                  <p className="text-muted-foreground">{t('命中率')}</p>
                   <p className="text-2xl font-bold">{stats.llm_hit_rate.toFixed(1)}%</p>
                 </div>
               </div>
               <Button onClick={handleClearLLMCache} disabled={loading} variant="destructive">
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Clear LLM Cache
+                {t('清理LLM缓存')}
               </Button>
             </>
           )}
@@ -78,13 +78,13 @@ const AdvancedTab = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Cache Information</CardTitle>
+          <CardTitle>{t('缓存信息')}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>• LLM responses are cached for 7 days</p>
-          <p>• Cache key includes: provider, model, temperature, template, and prompt</p>
-          <p>• Cached responses are stored in memory only</p>
-          <p>• Cache is cleared when the application restarts</p>
+          <p>• {t('缓存信息1')}</p>
+          <p>• {t('缓存信息2')}</p>
+          <p>• {t('缓存信息3')}</p>
+          <p>• {t('缓存信息4')}</p>
         </CardContent>
       </Card>
     </div>

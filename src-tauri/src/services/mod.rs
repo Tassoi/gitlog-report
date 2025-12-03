@@ -1,4 +1,4 @@
-// Services module
+// 服务模块
 
 pub mod git_service;
 pub mod llm_service;

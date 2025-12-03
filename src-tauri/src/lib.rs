@@ -1,13 +1,13 @@
-// Modules
+// 模块定义
 mod commands;
 mod models;
 mod services;
 mod utils;
 
-// Re-export commands for registration
+// 重导出命令以便注册
 use commands::{config, export, git, llm, report, template};
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+// 参考 https://tauri.app/develop/calling-rust/ 了解 Tauri 命令
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -21,24 +21,24 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             greet,
-            // Git commands
+            // Git 命令
             git::open_repository,
             git::get_commits,
             git::get_commit_diff,
             git::get_repo_stats,
-            // Cache commands (M6 - LLM only)
+            // 缓存命令（M6，仅 LLM）
             git::get_cache_stats,
             git::clear_llm_cache,
-            // LLM commands
+            // LLM 命令
             llm::configure_llm,
             llm::test_llm_connection,
-            // Report commands
+            // 报告相关命令
             report::generate_weekly_report,
             report::generate_monthly_report,
-            // Export commands (M4)
+            // 导出命令（M4）
             export::export_report,
             export::get_save_path,
-            // Template commands (M4.3)
+            // 模板命令（M4.3）
             template::list_templates,
             template::get_template,
             template::create_template,
@@ -46,7 +46,7 @@ pub fn run() {
             template::delete_template,
             template::set_default_template,
             template::get_default_template,
-            // Config commands (M5: API Keys are encrypted automatically)
+            // 配置命令（M5：API Key 自动加密）
             config::save_config,
             config::load_config,
             config::test_proxy,

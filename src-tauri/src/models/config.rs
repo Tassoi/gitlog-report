@@ -1,4 +1,4 @@
-// Configuration data models
+// 配置相关数据模型
 
 use serde::{Deserialize, Serialize};
 
@@ -123,7 +123,7 @@ pub enum ExportFormat {
     Pdf,
 }
 
-// M5: Proxy configuration
+// M5：代理配置
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ProxyConfig {

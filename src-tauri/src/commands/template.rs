@@ -1,4 +1,4 @@
-// Template management Tauri commands
+// 模板管理相关的 Tauri 命令
 
 use crate::models::{ReportTemplate, TemplateType};
 use crate::services::TemplateService;

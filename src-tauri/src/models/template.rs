@@ -1,4 +1,4 @@
-// Report template data model
+// 报告模板数据模型
 
 use serde::{Deserialize, Serialize};
 
@@ -16,11 +16,11 @@ pub struct ReportTemplate {
     pub name: String,
     #[serde(rename = "type")]
     pub template_type: TemplateType,
-    pub content: String, // Handlebars template content
+    pub content: String, // Handlebars 模板内容
     #[serde(rename = "isBuiltin")]
-    pub is_builtin: bool, // Built-in templates cannot be deleted
+    pub is_builtin: bool, // 内置模板不可删除
     #[serde(rename = "isDefault", default)]
-    pub is_default: bool, // Default template for its type
+    pub is_default: bool, // 该类型的默认模板
     #[serde(rename = "createdAt")]
     pub created_at: i64,
     #[serde(rename = "updatedAt")]
@@ -28,7 +28,7 @@ pub struct ReportTemplate {
 }
 
 impl ReportTemplate {
-    /// Creates a new custom template (deprecated - use new_user_template instead)
+    /// 创建自定义模板（已弃用，请改用 new_user_template）
     pub fn new_custom(name: String, content: String) -> Self {
         let now = chrono::Utc::now().timestamp();
         Self {
@@ -43,7 +43,7 @@ impl ReportTemplate {
         }
     }
 
-    /// Creates a new user-defined template with specified type
+    /// 创建指定类型的用户自定义模板
     pub fn new_user_template(name: String, template_type: TemplateType, content: String) -> Self {
         let now = chrono::Utc::now().timestamp();
         Self {
@@ -58,7 +58,7 @@ impl ReportTemplate {
         }
     }
 
-    /// Creates a built-in template (used for weekly/monthly defaults)
+    /// 创建内置模板（用于周报/月报默认模板）
     pub fn new_builtin(id: String, name: String, template_type: TemplateType, content: String) -> Self {
         let now = chrono::Utc::now().timestamp();
         Self {
@@ -67,19 +67,19 @@ impl ReportTemplate {
             template_type,
             content,
             is_builtin: true,
-            is_default: true, // Built-in templates are default by default
+            is_default: true, // 内置模板默认视为该类型的默认模板
             created_at: now,
             updated_at: now,
         }
     }
 
-    /// Updates the template content and timestamp
+    /// 更新模板内容及时间戳
     pub fn update_content(&mut self, new_content: String) {
         self.content = new_content;
         self.updated_at = chrono::Utc::now().timestamp();
     }
 
-    /// Updates the template name and timestamp
+    /// 更新模板名称及时间戳
     pub fn update_name(&mut self, new_name: String) {
         self.name = new_name;
         self.updated_at = chrono::Utc::now().timestamp();

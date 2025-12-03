@@ -1,4 +1,4 @@
-// Export commands - handles report export to files
+// 导出命令：负责将报告写入文件
 
 use crate::models::Report;
 use crate::services::ExportService;
@@ -27,8 +27,8 @@ pub async fn export_report(
     }
 }
 
-/// Opens save file dialog and returns the selected path
-/// This is a separate command to allow frontend to handle the dialog UI
+/// 打开保存文件对话框并返回所选路径
+/// 以独立命令形式暴露，方便前端自行管理对话框 UI
 #[tauri::command]
 pub async fn get_save_path(
     app: AppHandle,
@@ -37,21 +37,21 @@ pub async fn get_save_path(
 ) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::{DialogExt, FilePath};
 
-    // Determine file extension
+    // 确定文件扩展名
     let extension = match format.as_str() {
         "markdown" => "md",
         "html" => "html",
         _ => return Err(format!("Invalid format: {}", format)),
     };
 
-    // Build file filter
+    // 构建文件过滤器
     let filter_name = match format.as_str() {
         "markdown" => "Markdown 文件",
         "html" => "HTML 文件",
         _ => "文件",
     };
 
-    // Show save dialog
+    // 弹出保存对话框
     let file_path = app
         .dialog()
         .file()
@@ -62,6 +62,6 @@ pub async fn get_save_path(
     match file_path {
         Some(FilePath::Path(path)) => Ok(Some(path.to_string_lossy().to_string())),
         Some(FilePath::Url(_)) => Err("URL paths not supported".to_string()),
-        None => Ok(None), // User cancelled
+        None => Ok(None), // 用户取消
     }
 }

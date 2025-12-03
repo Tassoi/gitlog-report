@@ -1,2 +1,2 @@
-// Utility functions module
-// TODO: Add utility functions as needed
+// 工具函数模块
+// 待办：根据需要补充工具函数

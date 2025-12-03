@@ -1,4 +1,4 @@
-// Commands module
+// 命令模块
 
 pub mod git;
 pub mod llm;

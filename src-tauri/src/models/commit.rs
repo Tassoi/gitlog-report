@@ -1,4 +1,4 @@
-// Git-related data models
+// Git 相关数据模型
 
 use serde::{Deserialize, Serialize};
 

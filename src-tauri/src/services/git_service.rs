@@ -1,4 +1,4 @@
-// Git service - handles Git repository operations
+// Git 服务：封装仓库相关操作
 
 use crate::models::{Commit, RepoInfo, RepoStats};
 use git2::Repository;
@@ -11,8 +11,8 @@ pub struct GitService {
 }
 
 impl GitService {
-    /// Opens a Git repository at the specified path
-    /// Note: All timestamps are expected to be in UTC (Unix epoch seconds)
+    /// 打开指定路径的 Git 仓库
+    /// 注意：所有时间戳均为 UTC（Unix 秒）
     pub fn open_repo(path: &str) -> Result<Self, String> {
         let repo_path = PathBuf::from(path);
 
@@ -25,7 +25,7 @@ impl GitService {
         })
     }
 
-    /// Gets repository information
+    /// 获取仓库信息
     pub fn get_repo_info(&self) -> Result<RepoInfo, String> {
         let head = self.repository.head()
             .map_err(|e| format!("Failed to get HEAD: {}", e))?;
@@ -40,7 +40,7 @@ impl GitService {
             .unwrap_or("unknown")
             .to_string();
 
-        // Count total commits
+        // 统计提交总量
         let mut revwalk = self.repository.revwalk()
             .map_err(|e| format!("Failed to create revwalk: {}", e))?;
 
@@ -57,9 +57,9 @@ impl GitService {
         })
     }
 
-    /// Gets commits within a time range
-    /// from: Unix timestamp in seconds
-    /// to: Unix timestamp in seconds
+    /// 获取指定时间范围内的提交
+    /// from：Unix 时间戳（秒）
+    /// to：Unix 时间戳（秒）
     pub fn get_commits(&self, from: i64, to: i64) -> Result<Vec<Commit>, String> {
         let mut revwalk = self.repository.revwalk()
             .map_err(|e| format!("Failed to create revwalk: {}", e))?;
@@ -76,7 +76,7 @@ impl GitService {
 
             let commit_time = commit.time().seconds();
 
-            // Filter by time range
+            // 依据时间范围过滤
             if commit_time >= from && commit_time <= to {
                 let author = commit.author();
 
@@ -86,11 +86,11 @@ impl GitService {
                     email: author.email().unwrap_or("").to_string(),
                     timestamp: commit_time,
                     message: commit.message().unwrap_or("").to_string(),
-                    diff: None, // Diff loading deferred to M3
+                    diff: None, // 差异内容加载留到 M3
                 });
             }
 
-            // Stop if we're past the time range
+            // 超出时间范围则提前终止
             if commit_time < from {
                 break;
             }
@@ -99,7 +99,7 @@ impl GitService {
         Ok(commits)
     }
 
-    /// Gets diff for a specific commit
+    /// 获取指定提交的 diff
     pub fn get_commit_diff(&self, hash: &str) -> Result<String, String> {
         let oid = git2::Oid::from_str(hash)
             .map_err(|e| format!("Invalid commit hash: {}", e))?;
@@ -107,7 +107,7 @@ impl GitService {
         let commit = self.repository.find_commit(oid)
             .map_err(|e| format!("Failed to find commit: {}", e))?;
 
-        // Get parent commit (if exists)
+        // 获取父提交（若存在）
         let parent = if commit.parent_count() > 0 {
             Some(commit.parent(0)
                 .map_err(|e| format!("Failed to get parent: {}", e))?)
@@ -115,7 +115,7 @@ impl GitService {
             None
         };
 
-        // Get trees
+        // 获取树对象
         let tree = commit.tree()
             .map_err(|e| format!("Failed to get commit tree: {}", e))?;
 
@@ -124,14 +124,14 @@ impl GitService {
             .transpose()
             .map_err(|e| format!("Failed to get parent tree: {}", e))?;
 
-        // Create diff
+        // 生成 diff
         let diff = self.repository.diff_tree_to_tree(
             parent_tree.as_ref(),
             Some(&tree),
             None,
         ).map_err(|e| format!("Failed to create diff: {}", e))?;
 
-        // Convert diff to patch string
+        // 将 diff 转为 patch 文本
         let mut diff_text = String::new();
 
         diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| {
@@ -166,7 +166,7 @@ impl GitService {
         Ok(diff_text)
     }
 
-    /// Gets diff summary for large commits (>10KB)
+    /// 为超过 10KB 的大提交生成 diff 摘要
     pub fn get_commit_diff_summary(&self, hash: &str) -> Result<String, String> {
         let diff = self.get_commit_diff(hash)?;
 
@@ -176,7 +176,7 @@ impl GitService {
             return Ok(diff);
         }
 
-        // Parse diff to extract summary
+        // 解析 diff 生成概要
         let lines: Vec<&str> = diff.lines().collect();
         let mut files: Vec<String> = Vec::new();
         let mut insertions = 0;
@@ -210,19 +210,19 @@ impl GitService {
         ))
     }
 
-    /// Gets repository statistics from the given commits
+    /// 基于提交集合统计仓库数据
     pub fn get_stats(&self, commits: &[Commit]) -> Result<RepoStats, String> {
         let mut authors = HashSet::new();
         let mut files_changed = 0;
         let mut insertions = 0;
         let mut deletions = 0;
 
-        // Collect unique authors
+        // 收集作者集合
         for commit in commits {
             authors.insert(&commit.email);
         }
 
-        // Calculate diff stats for each commit
+        // 逐个提交计算 diff 统计
         for commit in commits {
             let oid = git2::Oid::from_str(&commit.hash)
                 .map_err(|e| format!("Invalid commit hash: {}", e))?;
@@ -230,7 +230,7 @@ impl GitService {
             let git_commit = self.repository.find_commit(oid)
                 .map_err(|e| format!("Failed to find commit: {}", e))?;
 
-            // Get parent commit (if exists)
+            // 获取父提交（若存在）
             let parent = if git_commit.parent_count() > 0 {
                 Some(git_commit.parent(0)
                     .map_err(|e| format!("Failed to get parent: {}", e))?)
@@ -238,7 +238,7 @@ impl GitService {
                 None
             };
 
-            // Get trees
+            // 获取树对象
             let tree = git_commit.tree()
                 .map_err(|e| format!("Failed to get commit tree: {}", e))?;
 
@@ -247,14 +247,14 @@ impl GitService {
                 .transpose()
                 .map_err(|e| format!("Failed to get parent tree: {}", e))?;
 
-            // Calculate diff
+            // 计算 diff
             let diff = self.repository.diff_tree_to_tree(
                 parent_tree.as_ref(),
                 Some(&tree),
                 None,
             ).map_err(|e| format!("Failed to create diff: {}", e))?;
 
-            // Count stats
+            // 汇总统计数据
             let stats = diff.stats()
                 .map_err(|e| format!("Failed to get diff stats: {}", e))?;
 

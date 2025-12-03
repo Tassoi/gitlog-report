@@ -1,4 +1,4 @@
-// Export service - handles report export to various formats
+// 导出服务：负责将报告输出为多种格式
 
 use crate::models::Report;
 use std::fs;
@@ -7,9 +7,9 @@ use std::path::Path;
 pub struct ExportService;
 
 impl ExportService {
-    /// Exports report as Markdown file
+    /// 导出 Markdown 文件
     pub fn export_markdown(report: &Report, save_path: &str) -> Result<(), String> {
-        // Validate path
+        // 校验路径
         let path = Path::new(save_path);
         if let Some(parent) = path.parent() {
             if !parent.exists() {
@@ -17,27 +17,27 @@ impl ExportService {
             }
         }
 
-        // Ensure .md extension
+        // 确保使用 .md 扩展名
         let save_path = if !save_path.ends_with(".md") {
             format!("{}.md", save_path)
         } else {
             save_path.to_string()
         };
 
-        // Build markdown content with metadata
+        // 构建包含元信息的 Markdown 内容
         let mut content = String::new();
 
-        // Header with metadata
+        // 元信息头
         content.push_str(&format!("# {}\n\n", report_type_to_chinese(&report.report_type)));
         content.push_str(&format!("> **生成时间**: {}\n", format_timestamp(report.generated_at)));
         content.push_str(&format!("> **提交数量**: {}\n", report.commits.len()));
         content.push_str(&format!("> **报告 ID**: {}\n\n", report.id));
         content.push_str("---\n\n");
 
-        // Main report content
+        // 报告正文
         content.push_str(&report.content);
 
-        // Footer with commit details
+        // 提交详情尾部
         content.push_str("\n\n---\n\n");
         content.push_str("## 📝 提交详情\n\n");
         for commit in &report.commits {
@@ -50,7 +50,7 @@ impl ExportService {
             ));
         }
 
-        // Write to file
+        // 写入文件
         fs::write(&save_path, content)
             .map_err(|e| format!("Failed to write markdown file: {}", e))?;
 
@@ -58,11 +58,11 @@ impl ExportService {
         Ok(())
     }
 
-    /// Exports report as HTML file with styling
+    /// 导出带样式的 HTML 文件
     pub fn export_html(report: &Report, save_path: &str) -> Result<(), String> {
         use pulldown_cmark::{html, Parser};
 
-        // Validate path
+        // 校验路径
         let path = Path::new(save_path);
         if let Some(parent) = path.parent() {
             if !parent.exists() {
@@ -70,22 +70,22 @@ impl ExportService {
             }
         }
 
-        // Ensure .html extension
+        // 确保使用 .html 扩展名
         let save_path = if !save_path.ends_with(".html") {
             format!("{}.html", save_path)
         } else {
             save_path.to_string()
         };
 
-        // Convert report content (markdown) to HTML
+        // 将报告（Markdown）内容转换为 HTML
         let parser = Parser::new(&report.content);
         let mut html_content = String::new();
         html::push_html(&mut html_content, parser);
 
-        // Build full HTML document with styling
+        // 构建完整 HTML 文档及样式
         let full_html = build_html_document(report, &html_content);
 
-        // Write to file
+        // 写入文件
         fs::write(&save_path, full_html)
             .map_err(|e| format!("Failed to write HTML file: {}", e))?;
 
@@ -95,7 +95,7 @@ impl ExportService {
 
 }
 
-/// Formats Unix timestamp to human-readable date
+/// 将 Unix 时间戳格式化成人类可读日期
 fn format_timestamp(timestamp: i64) -> String {
     use chrono::{DateTime, Utc};
 
@@ -104,7 +104,7 @@ fn format_timestamp(timestamp: i64) -> String {
         .unwrap_or_else(|| "Unknown date".to_string())
 }
 
-/// Converts ReportType to Chinese display name
+/// 将 ReportType 转为中文展示名称
 fn report_type_to_chinese(report_type: &crate::models::ReportType) -> &'static str {
     match report_type {
         crate::models::ReportType::Weekly => "周报",
@@ -113,7 +113,7 @@ fn report_type_to_chinese(report_type: &crate::models::ReportType) -> &'static s
     }
 }
 
-/// Builds complete HTML document with GitHub-style CSS
+/// 构建包含 GitHub 风格 CSS 的完整 HTML 文档
 fn build_html_document(report: &Report, html_content: &str) -> String {
     format!(
         r#"<!DOCTYPE html>
@@ -123,7 +123,7 @@ fn build_html_document(report: &Report, html_content: &str) -> String {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{} - {}</title>
     <style>
-        /* GitHub Markdown Style */
+        /* GitHub Markdown 风格 */
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
             font-size: 16px;
@@ -341,13 +341,13 @@ fn build_html_document(report: &Report, html_content: &str) -> String {
     </div>
 </body>
 </html>"#,
-        report_type_to_chinese(&report.report_type),           // title 第1个
-        format_timestamp(report.generated_at),                // title 第2个
-        report_type_to_chinese(&report.report_type),           // badge
-        report_type_to_chinese(&report.report_type),           // h1
-        format_timestamp(report.generated_at),                // metadata 生成时间
-        report.commits.len(),                                 // metadata 提交数量
-        report.id,                                            // metadata 报告ID
-        html_content                                          // content
+        report_type_to_chinese(&report.report_type),           // 占位 1：标题
+        format_timestamp(report.generated_at),                // 占位 2：副标题时间
+        report_type_to_chinese(&report.report_type),           // 徽章文案
+        report_type_to_chinese(&report.report_type),           // 一级标题文案
+        format_timestamp(report.generated_at),                // 元信息：生成时间
+        report.commits.len(),                                 // 元信息：提交数量
+        report.id,                                            // 元信息：报告 ID
+        html_content                                          // 主体内容
     )
 }

@@ -1,4 +1,4 @@
-// Configuration-related Tauri commands
+// 配置相关 Tauri 命令
 
 use crate::models::AppConfig;
 use crate::services::StorageService;
@@ -6,10 +6,10 @@ use tauri::AppHandle;
 
 #[tauri::command]
 pub async fn save_config(config: AppConfig, app: AppHandle) -> Result<(), String> {
-    // Validate config before saving
+    // 保存前先校验配置
     StorageService::validate_config(&config)?;
 
-    // Save to persistent storage (API Keys are encrypted automatically)
+    // 写入持久化存储（API Key 会自动加密）
     StorageService::save_config(&app, &config)?;
 
     Ok(())
@@ -17,7 +17,7 @@ pub async fn save_config(config: AppConfig, app: AppHandle) -> Result<(), String
 
 #[tauri::command]
 pub async fn load_config(app: AppHandle) -> Result<AppConfig, String> {
-    // Load from persistent storage (API Keys are decrypted automatically)
+    // 从持久化存储加载（API Key 会自动解密）
     StorageService::load_config(&app)
 }
 

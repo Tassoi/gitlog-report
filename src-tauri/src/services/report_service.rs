@@ -1,4 +1,4 @@
-// Report service - orchestrates report generation with Handlebars templates
+// 报告服务：用 Handlebars 模板编排报告生成流程
 
 use crate::commands::report::RepoGroup;
 use crate::models::{Commit, Report, ReportType, TemplateType};
@@ -18,7 +18,7 @@ impl ReportService {
     pub fn new(llm_service: Arc<LLMService>) -> Self {
         let mut handlebars = Handlebars::new();
 
-        // Register templates from embedded strings
+        // 从内置字符串注册模板
         handlebars
             .register_template_string("weekly", include_str!("../templates/weekly.hbs"))
             .expect("Failed to register weekly template");
@@ -32,7 +32,7 @@ impl ReportService {
         }
     }
 
-    /// Generates a weekly report with streaming
+    /// 流式生成周报
     pub async fn generate_weekly(
         &self,
         repo_groups: Vec<RepoGroup>,
@@ -43,7 +43,7 @@ impl ReportService {
             return Err("No repositories provided for report generation".to_string());
         }
 
-        // Flatten commits for stats
+        // 展平所有提交用于统计
         let all_commits: Vec<Commit> = repo_groups
             .iter()
             .flat_map(|g| g.commits.clone())
@@ -76,17 +76,17 @@ impl ReportService {
             "files_changed": stats.total_files_changed,
         });
 
-        // Get template content
+        // 读取模板内容
         let template_content = if let Some(tid) = template_id {
             let template = TemplateService::get_template(&app, &tid)?;
             template.content
         } else {
-            // Use default weekly template
+            // 使用默认周报模板
             let default_template = TemplateService::get_default_template(&app, TemplateType::Weekly)?;
             default_template.content
         };
 
-        // Render template
+        // 渲染模板
         let prompt = self
             .handlebars
             .render_template(&template_content, &context)
@@ -106,7 +106,7 @@ impl ReportService {
         })
     }
 
-    /// Generates a monthly report with streaming
+    /// 流式生成月报
     pub async fn generate_monthly(
         &self,
         repo_groups: Vec<RepoGroup>,
@@ -117,7 +117,7 @@ impl ReportService {
             return Err("No repositories provided for report generation".to_string());
         }
 
-        // Flatten commits for stats
+        // 展平所有提交用于统计
         let all_commits: Vec<Commit> = repo_groups
             .iter()
             .flat_map(|g| g.commits.clone())
@@ -153,17 +153,17 @@ impl ReportService {
             "weeks_count": commits_by_week.len(),
         });
 
-        // Get template content
+        // 读取模板内容
         let template_content = if let Some(tid) = template_id {
             let template = TemplateService::get_template(&app, &tid)?;
             template.content
         } else {
-            // Use default monthly template
+            // 使用默认月报模板
             let default_template = TemplateService::get_default_template(&app, TemplateType::Monthly)?;
             default_template.content
         };
 
-        // Render template
+        // 渲染模板
         let prompt = self
             .handlebars
             .render_template(&template_content, &context)
@@ -183,17 +183,17 @@ impl ReportService {
         })
     }
 
-    /// Calculates statistics from commits
+    /// 根据提交计算统计信息
     fn calculate_stats(&self, commits: &[Commit]) -> ReportStats {
         let unique_authors: HashSet<_> = commits.iter().map(|c| c.author.clone()).collect();
 
         ReportStats {
             unique_authors: unique_authors.len(),
-            total_files_changed: 0, // TODO: 计算文件变更数（需要 diff 信息）
+            total_files_changed: 0, // 待办：计算文件变更数（需要 diff 信息）
         }
     }
 
-    /// Groups commits by week
+    /// 按周聚合提交
     fn group_commits_by_week<'a>(&self, commits: &'a [Commit]) -> Vec<Vec<&'a Commit>> {
         use chrono::{DateTime, Datelike, Utc};
 
@@ -223,7 +223,7 @@ struct ReportStats {
     total_files_changed: usize,
 }
 
-/// Formats Unix timestamp to human-readable date
+/// 将 Unix 时间戳格式化为可读日期
 fn format_timestamp(timestamp: i64) -> String {
     use chrono::{DateTime, Utc};
 

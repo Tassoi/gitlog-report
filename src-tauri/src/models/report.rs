@@ -1,4 +1,4 @@
-// Report-related data models
+// 报告相关数据模型
 
 use serde::{Deserialize, Serialize};
 use super::commit::Commit;

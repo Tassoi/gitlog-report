@@ -1,4 +1,4 @@
-// Cache service - LLM 缓存接口（当前实现为无缓存占位）
+// 缓存服务：LLM 缓存接口（当前实现为无缓存占位）
 
 use serde::{Deserialize, Serialize};
 

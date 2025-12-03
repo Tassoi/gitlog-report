@@ -1,4 +1,4 @@
-// LLM service - handles AI model interactions with streaming support
+// LLM 服务：负责与各模型交互并支持流式输出
 
 use crate::models::{LLMProvider, ProxyConfig};
 use anyhow::Result;
@@ -15,9 +15,9 @@ pub struct LLMService {
 impl LLMService {
     pub fn new(provider: LLMProvider, proxy_config: Option<ProxyConfig>) -> Self {
         let mut client_builder = Client::builder()
-            .timeout(std::time::Duration::from_secs(90)); //
+            .timeout(std::time::Duration::from_secs(90)); // 设置 90 秒超时
 
-        // M5: Apply proxy configuration if provided
+        // M5：如有代理配置则套用
         if let Some(proxy_cfg) = proxy_config {
             if let Some(proxy_url) = proxy_cfg.get_https_proxy() {
                 if let Ok(proxy) = reqwest::Proxy::https(&proxy_url) {
@@ -36,7 +36,7 @@ impl LLMService {
         Self { client, provider }
     }
 
-    /// Generates a report using LLM with streaming progress
+    /// 通过 LLM 生成报告并返回流式内容
     pub async fn generate_report_streaming(
         &self,
         prompt: String,
@@ -46,7 +46,7 @@ impl LLMService {
             .await
     }
 
-    /// Generates a report with template_id (currently unused, kept for API compatibility)
+    /// 基于模板 ID 生成报告（目前仅为兼容，未实际使用）
     pub async fn generate_report_streaming_with_template(
         &self,
         prompt: String,
@@ -82,7 +82,7 @@ impl LLMService {
         Ok(content)
     }
 
-    /// OpenAI compatible API (OpenAI, DeepSeek, local models, etc.)
+    /// OpenAI 兼容接口（OpenAI、DeepSeek 及本地模型等）
     async fn generate_openai_streaming(
         &self,
         base_url: &str,
@@ -128,7 +128,7 @@ impl LLMService {
             let text = String::from_utf8_lossy(&chunk);
             buffer.push_str(&text);
 
-            // Process complete SSE messages (data: {...}\n\n)
+            // 解析完整的 SSE 消息（data: {...}\n\n）
             while let Some(pos) = buffer.find("\n\n") {
                 let message = buffer[..pos].to_string();
                 buffer = buffer[pos + 2..].to_string();
@@ -143,7 +143,7 @@ impl LLMService {
                             if let Some(content) = data["choices"][0]["delta"]["content"].as_str() {
                                 full_content.push_str(content);
 
-                                // Emit progress event
+                                // 发送进度事件
                                 let _ = app.emit("report-generation-progress", content);
                             }
                         }
@@ -159,7 +159,7 @@ impl LLMService {
         Ok(full_content)
     }
 
-    /// Claude API (Anthropic)
+    /// Claude API（Anthropic）
     async fn generate_claude_streaming(
         &self,
         base_url: &str,
@@ -205,7 +205,7 @@ impl LLMService {
             let text = String::from_utf8_lossy(&chunk);
             buffer.push_str(&text);
 
-            // Process complete SSE messages
+            // 解析完整 SSE 消息
             while let Some(pos) = buffer.find("\n\n") {
                 let message = buffer[..pos].to_string();
                 buffer = buffer[pos + 2..].to_string();
@@ -213,7 +213,7 @@ impl LLMService {
                 for line in message.lines() {
                     if let Some(json_str) = line.strip_prefix("data: ") {
                         if let Ok(data) = serde_json::from_str::<Value>(json_str) {
-                            // Claude format: {"type":"content_block_delta","delta":{"type":"text_delta","text":"..."}}
+                            // Claude 数据格式：{"type":"content_block_delta","delta":{"type":"text_delta","text":"..."}}
                             if data["type"] == "content_block_delta" {
                                 if let Some(text) = data["delta"]["text"].as_str() {
                                     full_content.push_str(text);
@@ -233,7 +233,7 @@ impl LLMService {
         Ok(full_content)
     }
 
-    /// Gemini API (Google)
+    /// Gemini API（Google）
     async fn generate_gemini_streaming(
         &self,
         base_url: &str,
@@ -242,7 +242,7 @@ impl LLMService {
         prompt: String,
         app: AppHandle,
     ) -> Result<String, String> {
-        // Gemini uses different URL structure: {base_url}/models/{model}:streamGenerateContent?key={api_key}
+        // Gemini 使用 {base_url}/models/{model}:streamGenerateContent?key={api_key} URL 结构
         let url = format!(
             "{}/models/{}:streamGenerateContent?key={}",
             base_url.trim_end_matches('/'),
@@ -283,7 +283,7 @@ impl LLMService {
             let text = String::from_utf8_lossy(&chunk);
             buffer.push_str(&text);
 
-            // Gemini streams JSON objects separated by newlines
+            // Gemini 以换行分隔的 JSON 流推送
             while let Some(pos) = buffer.find('\n') {
                 let line = buffer[..pos].trim().to_string();
                 buffer = buffer[pos + 1..].to_string();
@@ -293,7 +293,7 @@ impl LLMService {
                 }
 
                 if let Ok(data) = serde_json::from_str::<Value>(&line) {
-                    // Gemini format: {"candidates":[{"content":{"parts":[{"text":"..."}]}}]}
+                    // Gemini 数据格式示例：{"candidates":[{"content":{"parts":[{"text":"..."}]}}]}
                     if let Some(candidates) = data["candidates"].as_array() {
                         if let Some(first_candidate) = candidates.first() {
                             if let Some(parts) = first_candidate["content"]["parts"].as_array() {
@@ -317,7 +317,7 @@ impl LLMService {
         Ok(full_content)
     }
 
-    /// Test connection with a simple request (non-streaming)
+    /// 通过简单请求测试连接（非流式）
     pub async fn test_connection(&self) -> Result<bool, String> {
         match &self.provider {
             LLMProvider::OpenAI {

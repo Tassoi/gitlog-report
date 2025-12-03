@@ -1,4 +1,4 @@
-// Git-related Tauri commands
+// Git 相关 Tauri 命令
 
 use crate::models::{Commit, RepoInfo, RepoStats};
 use crate::services::{GitService, cache_service};
@@ -28,7 +28,7 @@ pub async fn get_repo_stats(path: String, from: i64, to: i64) -> Result<RepoStat
     git_service.get_stats(&commits)
 }
 
-// Cache management commands (LLM only)
+// 缓存管理命令（仅 LLM）
 #[tauri::command]
 pub async fn get_cache_stats() -> Result<cache_service::CacheStats, String> {
     Ok(cache_service::get_cache_stats().await)

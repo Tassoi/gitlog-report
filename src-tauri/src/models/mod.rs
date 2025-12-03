@@ -1,4 +1,4 @@
-// Models module
+// 数据模型模块
 
 pub mod commit;
 pub mod report;

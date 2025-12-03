@@ -1,4 +1,4 @@
-// Template service - manages report templates
+// 模板服务：负责管理报告模板
 
 use crate::models::{ReportTemplate, TemplateType};
 use std::collections::HashMap;
@@ -10,27 +10,27 @@ const TEMPLATES_STORE_KEY: &str = "templates";
 pub struct TemplateService;
 
 impl TemplateService {
-    /// Gets all templates (built-in + custom)
+    /// 获取所有模板（包含内置与自定义）
     pub fn list_templates(app: &AppHandle) -> Result<Vec<ReportTemplate>, String> {
         let mut templates = Vec::new();
 
-        // Add built-in templates
+        // 添加内置模板
         templates.push(Self::get_builtin_weekly());
         templates.push(Self::get_builtin_monthly());
 
-        // Load custom templates from store
+        // 从存储中加载自定义模板
         let custom_templates = Self::load_custom_templates(app)?;
         templates.extend(custom_templates);
 
-        // Sort by creation time (newest first)
+        // 按创建时间排序（最新在前）
         templates.sort_by(|a, b| b.created_at.cmp(&a.created_at));
 
         Ok(templates)
     }
 
-    /// Gets a template by ID
+    /// 通过 ID 获取模板
     pub fn get_template(app: &AppHandle, id: &str) -> Result<ReportTemplate, String> {
-        // Check built-in templates first
+        // 先检查内置模板
         if id == "builtin-weekly" {
             return Ok(Self::get_builtin_weekly());
         }
@@ -38,7 +38,7 @@ impl TemplateService {
             return Ok(Self::get_builtin_monthly());
         }
 
-        // Search in custom templates
+        // 在自定义模板中查找
         let custom_templates = Self::load_custom_templates(app)?;
         custom_templates
             .into_iter()
@@ -46,7 +46,7 @@ impl TemplateService {
             .ok_or_else(|| format!("Template not found: {}", id))
     }
 
-    /// Creates a new custom template
+    /// 创建新的自定义模板
     pub fn create_template(
         app: &AppHandle,
         name: String,
@@ -55,32 +55,32 @@ impl TemplateService {
     ) -> Result<ReportTemplate, String> {
         let template = ReportTemplate::new_user_template(name, template_type, content);
 
-        // Load existing templates
+        // 载入已有模板
         let mut templates = Self::load_custom_templates(app)?;
         templates.push(template.clone());
 
-        // Save to store
+        // 保存到存储
         Self::save_custom_templates(app, &templates)?;
 
         Ok(template)
     }
 
-    /// Updates an existing custom template
+    /// 更新已有的自定义模板
     pub fn update_template(
         app: &AppHandle,
         id: String,
         name: Option<String>,
         content: Option<String>,
-    ) -> Result<ReportTemplate, String> {
-        // Cannot update built-in templates
+) -> Result<ReportTemplate, String> {
+        // 禁止修改内置模板
         if id.starts_with("builtin-") {
             return Err("Cannot update built-in templates".to_string());
         }
 
-        // Load templates
+        // 加载模板列表
         let mut templates = Self::load_custom_templates(app)?;
 
-        // Find and update the template
+        // 查找并更新目标模板
         let template = templates
             .iter_mut()
             .find(|t| t.id == id)
@@ -95,47 +95,47 @@ impl TemplateService {
 
         let updated_template = template.clone();
 
-        // Save to store
+        // 保存到存储
         Self::save_custom_templates(app, &templates)?;
 
         Ok(updated_template)
     }
 
-    /// Deletes a custom template
+    /// 删除自定义模板
     pub fn delete_template(app: &AppHandle, id: &str) -> Result<(), String> {
-        // Cannot delete built-in templates
+        // 禁止删除内置模板
         if id.starts_with("builtin-") {
             return Err("Cannot delete built-in templates".to_string());
         }
 
-        // Load templates
+        // 加载模板列表
         let mut templates = Self::load_custom_templates(app)?;
 
-        // Find the template
+        // 定位目标模板
         let index = templates
             .iter()
             .position(|t| t.id == id)
             .ok_or_else(|| format!("Template not found: {}", id))?;
 
-        // Remove it
+        // 删除该模板
         templates.remove(index);
 
-        // Save to store
+        // 保存到存储
         Self::save_custom_templates(app, &templates)?;
 
         Ok(())
     }
 
-    /// Sets a template as the default for its type
-    /// When a template is set as default, all other templates of the same type will be unmarked
+    /// 将模板标记为对应类型的默认值
+    /// 若某模板成为默认，同类型其他模板会被取消默认状态
     pub fn set_default_template(app: &AppHandle, id: String) -> Result<(), String> {
-        // Get the template to find its type
+        // 先获取模板以确认类型
         let template = Self::get_template(app, &id)?;
         let template_type = template.template_type.clone();
 
-        // Handle built-in templates
+        // 处理内置模板场景
         if id.starts_with("builtin-") {
-            // Built-in templates are always default, just need to clear other defaults
+            // 内置模板始终为默认，只需清除其他模板的默认标记
             let mut custom_templates = Self::load_custom_templates(app)?;
             for t in custom_templates.iter_mut() {
                 if t.template_type == template_type {
@@ -146,7 +146,7 @@ impl TemplateService {
             return Ok(());
         }
 
-        // For custom templates, update all templates of the same type
+        // 针对自定义模板，更新同类型所有条目
         let mut custom_templates = Self::load_custom_templates(app)?;
         let mut found = false;
 
@@ -169,15 +169,15 @@ impl TemplateService {
         Ok(())
     }
 
-    /// Gets the default template for a given type
+    /// 获取指定类型的默认模板
     pub fn get_default_template(
         app: &AppHandle,
         template_type: TemplateType,
     ) -> Result<ReportTemplate, String> {
-        // Load all templates
+        // 加载全部模板
         let custom_templates = Self::load_custom_templates(app)?;
 
-        // Find default custom template first
+        // 优先查找自定义模板中的默认项
         if let Some(default_template) = custom_templates
             .iter()
             .find(|t| t.template_type == template_type && t.is_default)
@@ -185,7 +185,7 @@ impl TemplateService {
             return Ok(default_template.clone());
         }
 
-        // Fall back to built-in templates
+        // 否则退回内置模板
         match template_type {
             TemplateType::Weekly => Ok(Self::get_builtin_weekly()),
             TemplateType::Monthly => Ok(Self::get_builtin_monthly()),
@@ -195,7 +195,7 @@ impl TemplateService {
         }
     }
 
-    /// Gets the built-in weekly template
+    /// 获取内置周报模板
     fn get_builtin_weekly() -> ReportTemplate {
         ReportTemplate::new_builtin(
             "builtin-weekly".to_string(),
@@ -205,7 +205,7 @@ impl TemplateService {
         )
     }
 
-    /// Gets the built-in monthly template
+    /// 获取内置月报模板
     fn get_builtin_monthly() -> ReportTemplate {
         ReportTemplate::new_builtin(
             "builtin-monthly".to_string(),
@@ -215,7 +215,7 @@ impl TemplateService {
         )
     }
 
-    /// Loads custom templates from tauri-plugin-store
+    /// 从 tauri-plugin-store 载入自定义模板
     fn load_custom_templates(app: &AppHandle) -> Result<Vec<ReportTemplate>, String> {
         let store = app
             .store("templates.json")
@@ -230,7 +230,7 @@ impl TemplateService {
         }
     }
 
-    /// Saves custom templates to tauri-plugin-store
+    /// 将自定义模板保存到 tauri-plugin-store
     fn save_custom_templates(
         app: &AppHandle,
         templates: &[ReportTemplate],

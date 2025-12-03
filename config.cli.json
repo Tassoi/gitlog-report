@@ -1,0 +1,15 @@
+{
+  "llm_provider": {
+    "type": "openai",
+    "base_url": "https://api.siliconflow.cn/v1",
+    "api_key": "${OPENAI_API_KEY}",
+    "model": "Qwen/Qwen2.5-7B-Instruct"
+  },
+  "exportFormat": "markdown",
+  "timezone": "Asia/Shanghai",
+  "proxy_config": {
+    "enabled": false,
+    "httpProxy": null,
+    "httpsProxy": null
+  }
+}

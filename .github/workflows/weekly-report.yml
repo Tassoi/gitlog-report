@@ -42,6 +42,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Install dependencies
         run: npm ci
+      - name: Inject LLM API key
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          sed -i 's/\${OPENAI_API_KEY}/'"$OPENAI_API_KEY"'/g' config.cli.json
       - name: Generate weekly report
         env:
           REPORT_FILE: artifacts/report-weekly.md
@@ -62,14 +67,14 @@ jobs:
           echo "日期范围: $RANGE_FROM 至 $RANGE_TO"
           chmod +x scripts/generate-weekly-report.sh
           scripts/generate-weekly-report.sh
-      - name: Push to Feishu
-        env:
-          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-          FEISHU_SECRET: ${{ secrets.FEISHU_SECRET }}
-          REPORT_FILE: artifacts/report-weekly.md
-          REPORT_TITLE: '自动周报'
-          REPORT_SUMMARY: ''
-        run: node scripts/push-feishu.ts
+      # - name: Push to Feishu
+      #   env:
+      #     FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+      #     FEISHU_SECRET: ${{ secrets.FEISHU_SECRET }}
+      #     REPORT_FILE: artifacts/report-weekly.md
+      #     REPORT_TITLE: '自动周报'
+      #     REPORT_SUMMARY: ''
+      #   run: node scripts/push-feishu.ts
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-report

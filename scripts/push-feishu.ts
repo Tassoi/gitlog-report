@@ -18,7 +18,7 @@ interface SendMessageResponse {
 interface PushOptions {
   appId: string;
   appSecret: string;
-  userId: string;
+  userIds: string[];
   title: string;
   reportPath: string;
 }
@@ -89,9 +89,12 @@ async function pushToFeishu(options: PushOptions) {
   const reportContent = await readFileSafe(options.reportPath);
   const content = options.title ? `${options.title}\n\n${reportContent}` : reportContent;
 
-  // 3. 发送消息
-  console.log('正在发送消息到飞书...');
-  await sendMessage(token, options.userId, content);
+  // 3. 发送消息给所有用户
+  console.log(`正在发送消息到飞书（共 ${options.userIds.length} 位用户）...`);
+  for (const userId of options.userIds) {
+    await sendMessage(token, userId, content);
+    console.log(`  ✓ 已发送给用户: ${userId.slice(0, 8)}...`);
+  }
 
   console.log('✅ 飞书推送成功');
 }
@@ -99,7 +102,7 @@ async function pushToFeishu(options: PushOptions) {
 async function main() {
   const appId = process.env.FEISHU_APP_ID;
   const appSecret = process.env.FEISHU_APP_SECRET;
-  const userId = process.env.FEISHU_USER_OPEN_ID;
+  const userIdsRaw = process.env.FEISHU_USER_OPEN_IDS;
 
   if (!appId) {
     throw new Error('缺少 FEISHU_APP_ID 环境变量');
@@ -107,8 +110,14 @@ async function main() {
   if (!appSecret) {
     throw new Error('缺少 FEISHU_APP_SECRET 环境变量');
   }
-  if (!userId) {
-    throw new Error('缺少 FEISHU_USER_OPEN_ID 环境变量');
+  if (!userIdsRaw) {
+    throw new Error('缺少 FEISHU_USER_OPEN_IDS 环境变量');
+  }
+
+  // 支持逗号分隔的多个用户 ID
+  const userIds = userIdsRaw.split(',').map((id) => id.trim()).filter(Boolean);
+  if (userIds.length === 0) {
+    throw new Error('FEISHU_USER_OPEN_IDS 不能为空');
   }
 
   const reportPath = process.env.REPORT_FILE ?? 'dist/report-weekly.md';
@@ -117,7 +126,7 @@ async function main() {
   await pushToFeishu({
     appId,
     appSecret,
-    userId,
+    userIds,
     title,
     reportPath,
   });

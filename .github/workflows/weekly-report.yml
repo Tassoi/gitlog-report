@@ -10,7 +10,7 @@ on:
         description: '结束日期 (YYYY-MM-DD)'
         required: false
   schedule:
-    - cron: '0 1 * * FRI'  # 每周五 09:00 北京时间
+    - cron: '0 1 * * FRI' # 每周五 09:00 北京时间
 
 jobs:
   generate:
@@ -71,15 +71,15 @@ jobs:
           echo "日期范围: $RANGE_FROM 至 $RANGE_TO"
           chmod +x scripts/generate-weekly-report.sh
           scripts/generate-weekly-report.sh
-      # - name: Push to Feishu
-      #   env:
-      #     FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-      #     FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-      #     FEISHU_USER_OPEN_ID: ${{ secrets.FEISHU_USER_OPEN_ID }}
-      #     REPORT_FILE: artifacts/report-weekly.md
-      #     REPORT_TITLE: '自动周报'
-      #     REPORT_SUMMARY: ''
-      #   run: npx tsx scripts/push-feishu.ts
+      - name: Push to Feishu
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_USER_OPEN_IDS: ${{ secrets.FEISHU_USER_OPEN_IDS }}
+          REPORT_FILE: artifacts/report-weekly.md
+          REPORT_TITLE: '自动周报'
+          REPORT_SUMMARY: ''
+        run: npx tsx scripts/push-feishu.ts
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-report

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRepoStore } from '@/store/repoStore';
 import { useGitRepo } from '@/hooks/useGitRepo';
 import CommitList from '@/components/CommitList';
@@ -13,13 +14,14 @@ export function Commits() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedRepoFilter, setSelectedRepoFilter] = useState<string>('all');
+  const { t } = useTranslation();
 
   const handleOpenRepo = async () => {
     try {
       const path = await selectRepository();
       if (!path) return;
 
-      const loadingToast = toast.loading('正在打开仓库...');
+      const loadingToast = toast.loading(t('正在打开仓库'));
       const info = await openRepository(path);
       const repoId = addRepoToHistory(info);
 
@@ -30,9 +32,11 @@ export function Commits() {
 
       addActiveRepo(repoId, info, fetchedCommits);
       toast.dismiss(loadingToast);
-      toast.success(`已添加 ${info.name}，加载了 ${fetchedCommits.length} 个提交`);
+      toast.success(t('已添加仓库', { name: info.name, count: fetchedCommits.length }));
     } catch (error) {
-      toast.error(`打开仓库失败：${error instanceof Error ? error.message : '未知错误'}`);
+      toast.error(
+        t('打开仓库失败', { error: error instanceof Error ? error.message : t('未知错误') })
+      );
     }
   };
 
@@ -80,9 +84,9 @@ export function Commits() {
     <div className="p-6 space-y-6">
       {activeRepos.size === 0 ? (
         <EmptyState
-          title="No Repository Selected"
-          description="Open a repository to view commit history"
-          action={{ label: 'Open Repository', onClick: handleOpenRepo }}
+          title={t('未选择仓库标题')}
+          description={t('未选择仓库描述')}
+          action={{ label: t('打开仓库'), onClick: handleOpenRepo }}
         />
       ) : (
         <CommitList

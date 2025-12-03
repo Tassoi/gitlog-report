@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   useReactTable,
@@ -90,6 +91,7 @@ const CommitList = ({
   onDateRangeChange,
   onRepoFilterChange,
 }: CommitListProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const {
     selectedCommits,
@@ -199,7 +201,7 @@ const CommitList = ({
         const repoData = activeRepos.get(repoId);
         return {
           repo_id: repoId,
-          repo_name: repoData?.repoInfo.name || 'Unknown',
+          repo_name: repoData?.repoInfo.name || t('未知仓库'),
           repo_path: repoData?.repoInfo.path || '',
           commits,
         };
@@ -207,7 +209,7 @@ const CommitList = ({
 
       const commandName =
         reportType === 'weekly' ? 'generate_weekly_report' : 'generate_monthly_report';
-      const reportTypeName = reportType === 'weekly' ? '周报' : '月报';
+      const reportTypeName = reportType === 'weekly' ? t('周报') : t('月报');
 
       const report = await invoke<Report>(commandName, {
         repoGroups,
@@ -223,12 +225,16 @@ const CommitList = ({
       };
 
       setReport(enrichedReport);
-      toast.success(`${reportTypeName}生成成功`);
+      toast.success(t('生成成功', { type: reportTypeName }));
       setReportDialogOpen(false);
       navigate('/reports');
     } catch (err) {
       console.error(`生成失败:`, err);
-      toast.error(`生成失败: ${err instanceof Error ? err.message : String(err)}`);
+      toast.error(
+        t('生成失败', {
+          error: err instanceof Error ? err.message : String(err),
+        })
+      );
     } finally {
       setGenerating(false);
     }
@@ -261,20 +267,20 @@ const CommitList = ({
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
+            aria-label={t('选择全部')}
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
+            aria-label={t('选择行')}
           />
         ),
       },
       {
         accessorKey: 'hash',
-        header: 'Hash',
+        header: t('哈希'),
         cell: ({ row }) => (
           <Badge variant="outline" className="font-mono text-xs">
             {row.original.hash.substring(0, 7)}
@@ -283,7 +289,7 @@ const CommitList = ({
       },
       {
         accessorKey: 'repoId',
-        header: 'Repository',
+        header: t('仓库'),
         cell: ({ row }) => {
           const repoId = (row.original as any).repoId;
           if (!repoId) return null;
@@ -297,7 +303,7 @@ const CommitList = ({
       },
       {
         accessorKey: 'message',
-        header: 'Message',
+        header: t('提交信息'),
         cell: ({ row }) => (
           <div className="max-w-md overflow-hidden text-ellipsis whitespace-nowrap">
             {row.original.message}
@@ -306,11 +312,11 @@ const CommitList = ({
       },
       {
         accessorKey: 'author',
-        header: 'Author',
+        header: t('作者'),
       },
       {
         accessorKey: 'timestamp',
-        header: 'Date',
+        header: t('日期'),
         cell: ({ row }) => new Date(row.original.timestamp * 1000).toLocaleDateString(),
       },
       {
@@ -323,7 +329,7 @@ const CommitList = ({
         ),
       },
     ],
-    [activeRepos]
+    [activeRepos, t]
   );
 
   const table = useReactTable({
@@ -365,11 +371,11 @@ const CommitList = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Commits</CardTitle>
+        <CardTitle>{t('提交列表')}</CardTitle>
         <CardDescription>
           {selectedCommits.length > 0
-            ? `Selected: ${selectedCommits.length} commit(s)`
-            : 'Click to select commits for report generation'}
+            ? t('已选择提交', { count: selectedCommits.length })
+            : t('点击选择提交生成报告')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -379,7 +385,7 @@ const CommitList = ({
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8">
                   <User className="mr-2 h-4 w-4" />
-                  {selectedAuthor === 'all' ? '所有作者' : selectedAuthor}
+                  {selectedAuthor === 'all' ? t('所有作者') : selectedAuthor}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -389,7 +395,7 @@ const CommitList = ({
                     onSearchChange('');
                   }}
                 >
-                  所有作者
+                  {t('所有作者')}
                 </DropdownMenuItem>
                 {uniqueAuthors.map((author) => (
                   <DropdownMenuItem
@@ -411,7 +417,7 @@ const CommitList = ({
                   <Calendar className="mr-2 h-4 w-4" />
                   {dateRange?.from && dateRange?.to
                     ? `${format(dateRange.from, 'MM/dd/yyyy')} - ${format(dateRange.to, 'MM/dd/yyyy')}`
-                    : '选择日期范围'}
+                    : t('选择日期范围')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
@@ -427,7 +433,7 @@ const CommitList = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onRepoFilterChange('all')}>
-                    All Repositories
+                    {t('全部仓库')}
                   </DropdownMenuItem>
                   {Array.from<[string, any]>(activeRepos.entries()).map(([id, { repoInfo }]) => (
                     <DropdownMenuItem key={id} onClick={() => onRepoFilterChange(id)}>
@@ -446,7 +452,7 @@ const CommitList = ({
                   table.resetColumnFilters();
                 }}
               >
-                Reset
+                {t('重置')}
                 <X className="ml-2 h-4 w-4" />
               </Button>
             )}
@@ -457,14 +463,14 @@ const CommitList = ({
             disabled={selectedCommits.length === 0}
           >
             <FileText className="mr-2 h-4 w-4" />
-            生成报告
+            {t('生成报告')}
           </Button>
         </div>
 
         {commits.length === 0 ? (
           <EmptyState
-            title="No Commits Found"
-            description="Try adjusting your time range or search filters"
+            title={t('未找到提交标题')}
+            description={t('尝试调整时间范围或搜索过滤条件')}
           />
         ) : (
           <>
@@ -497,7 +503,7 @@ const CommitList = ({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No results.
+                        {t('没有结果')}
                       </TableCell>
                     </TableRow>
                   )}
@@ -507,12 +513,14 @@ const CommitList = ({
 
             <div className="flex items-center justify-between px-2">
               <div className="flex-1 text-sm text-muted-foreground">
-                {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {t('行选择统计', {
+                  selected: table.getFilteredSelectedRowModel().rows.length,
+                  total: table.getFilteredRowModel().rows.length,
+                })}
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">Rows per page</p>
+                  <p className="text-sm font-medium">{t('每页行数')}</p>
                   <select
                     value={table.getState().pagination.pageSize}
                     onChange={(e) => table.setPageSize(Number(e.target.value))}
@@ -527,7 +535,10 @@ const CommitList = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                    {t('分页统计', {
+                      page: table.getState().pagination.pageIndex + 1,
+                      total: table.getPageCount(),
+                    })}
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -572,16 +583,16 @@ const CommitList = ({
         <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>生成报告</DialogTitle>
+              <DialogTitle>{t('生成报告')}</DialogTitle>
               <DialogDescription>
                 {selectedCommits.length > 0
-                  ? `基于 ${selectedCommits.length} 个选中的提交`
-                  : '基于所有提交'}
+                  ? t('基于选中的提交', { count: selectedCommits.length })
+                  : t('基于所有提交')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>报告类型</Label>
+                <Label>{t('报告类型')}</Label>
                 <div className="flex gap-2">
                   <Button
                     variant={reportType === 'weekly' ? 'default' : 'outline'}
@@ -589,7 +600,7 @@ const CommitList = ({
                     className="flex-1"
                   >
                     <FileText className="mr-2 h-4 w-4" />
-                    周报
+                    {t('周报')}
                   </Button>
                   <Button
                     variant={reportType === 'monthly' ? 'default' : 'outline'}
@@ -597,22 +608,22 @@ const CommitList = ({
                     className="flex-1"
                   >
                     <Calendar className="mr-2 h-4 w-4" />
-                    月报
+                    {t('月报')}
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>选择模板</Label>
+                <Label>{t('选择模板')}</Label>
                 <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择模板" />
+                    <SelectValue placeholder={t('选择模板')} />
                   </SelectTrigger>
                   <SelectContent>
                     {currentTypeTemplates.map((template) => (
                       <SelectItem key={template.id} value={template.id}>
                         {template.name}
-                        {template.isDefault && ' (默认)'}
+                        {template.isDefault && ` ${t('默认')}`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -625,7 +636,7 @@ const CommitList = ({
                 className="w-full"
               >
                 {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isGenerating ? '生成中...' : `生成${reportType === 'weekly' ? '周报' : '月报'}`}
+                {isGenerating ? t('生成中') : t('生成报告')}
               </Button>
 
               {isGenerating && (
@@ -633,13 +644,13 @@ const CommitList = ({
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                      <CardTitle className="text-base">生成中...</CardTitle>
+                      <CardTitle className="text-base">{t('生成中')}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <ScrollArea className="h-[200px] w-full rounded-md border bg-muted/30 p-4">
                       <pre className="whitespace-pre-wrap text-xs">
-                        {streamingContent || 'Waiting for response...'}
+                        {streamingContent || t('等待响应')}
                       </pre>
                     </ScrollArea>
                   </CardContent>
@@ -667,14 +678,14 @@ const CommitList = ({
               {loadingDiffs.has(selectedCommit?.hash || '') ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground p-4">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading diff...
+                  {t('加载Diff')}
                 </div>
               ) : commitDiffs[selectedCommit?.hash || ''] ? (
                 <pre className="text-xs bg-muted p-4 rounded overflow-x-auto">
                   {commitDiffs[selectedCommit?.hash || '']}
                 </pre>
               ) : (
-                <p className="text-sm text-muted-foreground p-4">No diff available</p>
+                <p className="text-sm text-muted-foreground p-4">{t('无可用Diff')}</p>
               )}
             </ScrollArea>
           </DialogContent>

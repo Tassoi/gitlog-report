@@ -7,7 +7,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/comp
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/EmptyState';
 import { AuthorRadialChart, CommitTrendChart, CommitTypeChart } from './Charts';
-import { FolderOpen, FileText, GitCommit, Users, TrendingUp, Calendar } from 'lucide-react';
+import { FolderOpen, GitCommit, Users, TrendingUp, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 

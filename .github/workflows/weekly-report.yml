@@ -80,6 +80,13 @@ jobs:
           REPORT_TITLE: '自动周报'
           REPORT_SUMMARY: ''
         run: npx tsx scripts/push-feishu.ts
+      # - name: Push to Dingtalk
+      #   env:
+      #     DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+      #     DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+      #     REPORT_FILE: artifacts/report-weekly.md
+      #     REPORT_TITLE: '自动周报'
+      #   run: npx tsx scripts/push-dingtalk.ts
       - uses: actions/upload-artifact@v4
         with:
           name: weekly-report

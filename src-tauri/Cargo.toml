@@ -42,6 +42,8 @@ handlebars = "5.1"
 
 # Configuration persistence (M3)
 tauri-plugin-store = "2.0.0"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
 
 # Async utilities (M3)
 futures = "0.3"

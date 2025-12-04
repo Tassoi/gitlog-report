@@ -203,4 +203,11 @@ export default {
   操作成功: 'Operation successful',
   操作失败: 'Operation failed',
   未知错误: 'Unknown error',
+
+  // 更新相关
+  发现新版本: 'Update Available',
+  新版本可用: 'Version {{version}} is available. Update now?',
+  下载中: 'Downloading',
+  稍后提醒: 'Later',
+  立即更新: 'Update Now',
 };

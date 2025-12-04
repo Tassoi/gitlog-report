@@ -5,6 +5,7 @@ import { router } from './router';
 import { useTheme } from './hooks/useTheme';
 import { useRepoStore } from './store/repoStore';
 import { useGitRepo } from './hooks/useGitRepo';
+import { UpdateDialog } from './components/UpdateDialog';
 
 function App() {
   useTheme();
@@ -34,6 +35,7 @@ function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
+      <UpdateDialog />
       <RouterProvider router={router} />
     </>
   );
